@@ -5,7 +5,7 @@ from typing import List, Optional
 import numpy as np
 
 
-def slice_stl(
+def plot_stl_slice(
     mesh,
     plane_origin: List[float] = None,
     plane_normal: List[float] = [0, 0, 1],
@@ -55,19 +55,23 @@ def slice_stl(
     return plt
 
 
-def plot_2d_array(
+def plot_mesh(
     values: np.ndarray,
     filename: Optional[str] = None,
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
+    base_plt
 ):
 
-    fig = plt.subplot()
+    if base_plt:
+        pass
+    else:
+        fig = plt.subplot()
     image_map = fig.imshow(values, norm=scale, vmin=vmin)
     plt.colorbar(image_map, label=label)
     if filename:
         plt.savefig(filename, dpi=300)
-    fig.clear()
-    plt.close()
+    # fig.clear()
+    # plt.close()
     return fig
