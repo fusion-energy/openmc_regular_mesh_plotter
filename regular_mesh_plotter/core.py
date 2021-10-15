@@ -6,10 +6,11 @@ import numpy as np
 
 
 def plot_stl_slice(
-    mesh,
+    stl_or_mesh,
     plane_origin: List[float] = None,
     plane_normal: List[float] = [0, 0, 1],
     rotate_plot: float = 0,
+    filename: Optional[str] = None,
 ) -> plt:
     """Slices through a 3D geometry in STL file format and extracts a slice of
     the geometry at the provided plane and origin
@@ -26,6 +27,11 @@ def plot_stl_slice(
     Return:
         A matplotlib.pyplot object
     """
+
+    if isinstance(stl_or_mesh, str):
+        mesh = trimesh.load_mesh(stl_or_mesh, process=False)
+    else:
+        mesh = stl_or_mesh
 
     if plane_origin is None:
         plane_origin = mesh.centroid
@@ -52,6 +58,8 @@ def plot_stl_slice(
         else:
             plt.plot(*discrete.T, color="black", linewidth=1)
 
+    if filename:
+        plt.savefig(filename, dpi=300)
     return plt
 
 
