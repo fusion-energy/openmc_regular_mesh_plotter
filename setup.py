@@ -35,5 +35,6 @@ setuptools.setup(
     install_requires=[
         "numpy>=1.21.1",
         "matplotlib>=3.4.2",
+        "trimesh"
     ],
 )

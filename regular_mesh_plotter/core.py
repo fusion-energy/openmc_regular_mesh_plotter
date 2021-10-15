@@ -61,7 +61,7 @@ def plot_mesh(
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
-    base_plt
+    base_plt=None
 ):
 
     if base_plt:
