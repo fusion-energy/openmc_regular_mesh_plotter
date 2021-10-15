@@ -73,13 +73,14 @@ def plot_mesh(
 ):
 
     if base_plt:
-        pass
+        plt = base_plt
     else:
-        fig = plt.subplot()
-    image_map = fig.imshow(values, norm=scale, vmin=vmin)
+        plt = plt.subplot()
+    image_map = plt.imshow(values, norm=scale, vmin=vmin)
+    # image_map = fig.imshow(values, norm=scale, vmin=vmin)
     plt.colorbar(image_map, label=label)
     if filename:
         plt.savefig(filename, dpi=300)
     # fig.clear()
     # plt.close()
-    return fig
+    return plt
