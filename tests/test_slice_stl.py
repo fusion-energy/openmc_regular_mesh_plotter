@@ -1,7 +1,7 @@
 import unittest
 
 import trimesh
-from regular_map_plotter import plot_stl_slice
+from regular_mesh_plotter import plot_stl_slice
 
 
 class TestShape(unittest.TestCase):
