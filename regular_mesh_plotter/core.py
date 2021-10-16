@@ -69,14 +69,26 @@ def plot_mesh(
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
-    base_plt=None
+    base_plt=None,
+    extent=None,
+    x_label='X [cm]',
+    y_label='Y [cm]',
 ):
 
     if base_plt:
         plt = base_plt
     else:
         plt = plt.subplot()
-    image_map = plt.imshow(values, norm=scale, vmin=vmin)
+    image_map = plt.imshow(
+        values,
+        norm=scale,
+        vmin=vmin,
+        extent=extent
+    )
+
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+
     # image_map = fig.imshow(values, norm=scale, vmin=vmin)
     plt.colorbar(image_map, label=label)
     if filename:
