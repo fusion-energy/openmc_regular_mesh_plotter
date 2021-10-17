@@ -96,3 +96,30 @@ def plot_mesh(
     # fig.clear()
     # plt.close()
     return plt
+
+def get_tally_extent(
+    tally,
+):
+    import openmc
+    for filter in tally.filters:
+        if isinstance(filter, openmc.MeshFilter):
+            mesh_filter = filter
+            print(mesh_filter)
+            print(mesh_filter.mesh.lower_left)
+            print(mesh_filter.mesh.upper_right)
+    
+    extent_x = (min(mesh_filter.mesh.lower_left[0],mesh_filter.mesh.upper_right[0]), max(mesh_filter.mesh.lower_left[0],mesh_filter.mesh.upper_right[0]))
+    extent_y = (min(mesh_filter.mesh.lower_left[1],mesh_filter.mesh.upper_right[1]), max(mesh_filter.mesh.lower_left[1],mesh_filter.mesh.upper_right[1]))
+    extent_z = (min(mesh_filter.mesh.lower_left[2],mesh_filter.mesh.upper_right[2]), max(mesh_filter.mesh.lower_left[2],mesh_filter.mesh.upper_right[2]))
+    
+    if 1 in mesh_filter.mesh.width:
+        print('2d mesh tally')
+        index_of_1d = mesh_filter.mesh.width.tolist().index(1)
+        print('index', index_of_1d)
+        if index_of_1d == 0:
+            return extent_y + extent_z
+        if index_of_1d == 1:
+            return extent_x + extent_z
+        if index_of_1d == 2:
+            return extent_x + extent_y
+    return None
