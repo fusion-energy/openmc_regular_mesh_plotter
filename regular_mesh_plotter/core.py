@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib import transforms
 from typing import List, Optional
 import numpy as np
-
+from pathlib import Path
 
 def plot_stl_slice(
     stl_or_mesh,
@@ -29,6 +29,8 @@ def plot_stl_slice(
     """
 
     if isinstance(stl_or_mesh, str):
+        if not Path(stl_or_mesh).is_file():
+            raise FileNotFoundError(f'file {stl_or_mesh} not found.')
         mesh = trimesh.load_mesh(stl_or_mesh, process=False)
     else:
         mesh = stl_or_mesh
@@ -78,7 +80,8 @@ def plot_mesh(
     if base_plt:
         plt = base_plt
     else:
-        plt = plt.subplot()
+        import matplotlib.pyplot as plt
+        plt.plot()
     image_map = plt.imshow(
         values,
         norm=scale,

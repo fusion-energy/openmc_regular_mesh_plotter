@@ -7,7 +7,7 @@ from regular_mesh_plotter import plot_stl_slice
 class TestShape(unittest.TestCase):
     def setUp(self):
 
-        self.mesh = trimesh.load_mesh("example.stl", process=False)
+        self.mesh = trimesh.load_mesh("tests/example.stl", process=False)
 
     def test_z_axis_slice(self):
 
