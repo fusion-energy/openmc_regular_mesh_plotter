@@ -36,6 +36,7 @@ setuptools.setup(
         "numpy>=1.21.1",
         "matplotlib>=3.4.2",
         "trimesh",
-        "shapely"
+        "shapely",
+        "scipy"
     ],
 )
