@@ -5,6 +5,9 @@ from typing import List, Optional
 import numpy as np
 from pathlib import Path
 
+import openmc_post_processor as opp
+import openmc
+
 def plot_geometry_mesh(
     mesh_file_or_trimesh_object,
     plane_origin: List[float] = None,
@@ -63,7 +66,6 @@ def plot_geometry_mesh(
     if filename:
         plt.savefig(filename, dpi=300)
     return plt
-
 
 def plot_regular_mesh_values(
     values: np.ndarray,
@@ -135,8 +137,42 @@ def plot_regular_mesh_values_with_geometry(
 
     return both
 
+def plot_regular_mesh_tally_with_geometry(
+    tally,
+    mesh_file_or_trimesh_object,
+    filename: Optional[str] = None,
+    scale=None,  # LogNorm(),
+    vmin=None,
+    label="",
+    x_label='X [cm]',
+    y_label='Y [cm]',
+    plane_origin: List[float] = None,
+    plane_normal: List[float] = [0, 0, 1],
+    rotate_plot: float = 0,
+):
+
+    slice = plot_geometry_mesh(
+        mesh_file_or_trimesh_object=mesh_file_or_trimesh_object,
+        plane_origin = plane_origin,
+        plane_normal = plane_normal,
+        rotate_plot = rotate_plot
+    )
+
+    both = plot_regular_mesh_tally(
+        tally=tally,
+        filename=filename,
+        scale=scale,  # LogNorm(),
+        vmin=vmin,
+        label=label,
+        base_plt=slice,
+        x_label=x_label,
+        y_label=y_label,
+    )
+
+    return both
+
 def plot_regular_mesh_tally(
-    tally: np.ndarray,
+    tally,
     filename: Optional[str] = None,
     scale=None,  # LogNorm(),
     vmin=None,
@@ -152,12 +188,13 @@ def plot_regular_mesh_tally(
         import matplotlib.pyplot as plt
         plt.plot()
 
-    import openmc_post_processor as opp
-    values = statepoint.process_tally(
-        tally=my_tally_1,
+    values = opp.process_dose_tally(
+        tally=tally,
     )
 
     extent = get_tally_extent(tally)
+
+    print('extent', extent)
 
     image_map = plt.imshow(
         values,
@@ -180,7 +217,7 @@ def plot_regular_mesh_tally(
 def get_tally_extent(
     tally,
 ):
-    import openmc
+
     for filter in tally.filters:
         if isinstance(filter, openmc.MeshFilter):
             mesh_filter = filter

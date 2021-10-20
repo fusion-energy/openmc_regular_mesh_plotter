@@ -1,5 +1,5 @@
 import unittest
-from regular_mesh_plotter import plot_regular_mesh_tally
+from regular_mesh_plotter import plot_regular_mesh_values
 import numpy as np
 import matplotlib
 
@@ -74,6 +74,6 @@ class TestPlotRegularMeshTally(unittest.TestCase):
 
     def test_plot_regular_mesh_tally(self):
 
-        test_plot = plot_regular_mesh_tally(values=self.values, filename='test.png')
+        test_plot = plot_regular_mesh_values(values=self.values, filename='test.png')
 
         assert isinstance(test_plot, type(matplotlib.pyplot))
