@@ -1,10 +1,10 @@
 import unittest
-from regular_mesh_plotter import plot_mesh
+from regular_mesh_plotter import plot_regular_mesh_values
 import numpy as np
 import matplotlib
 
 
-class TestPlotSpectra(unittest.TestCase):
+class TestPlotRegularMeshTally(unittest.TestCase):
     def setUp(self):
 
         self.values = np.array(
@@ -72,8 +72,8 @@ class TestPlotSpectra(unittest.TestCase):
             ]
         )
 
-    def test_plot_mesh(self):
+    def test_plot_regular_mesh_tally(self):
 
-        test_plot = plot_mesh(values=self.values, filename='test.png')
+        test_plot = plot_regular_mesh_values(values=self.values, filename='test.png')
 
         assert isinstance(test_plot, type(matplotlib.pyplot))
