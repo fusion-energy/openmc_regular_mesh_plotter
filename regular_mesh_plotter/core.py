@@ -5,8 +5,8 @@ from typing import List, Optional
 import numpy as np
 from pathlib import Path
 
-def plot_stl_slice(
-    stl_or_mesh,
+def plot_geometry_mesh(
+    mesh_file_or_trimesh_object,
     plane_origin: List[float] = None,
     plane_normal: List[float] = [0, 0, 1],
     rotate_plot: float = 0,
@@ -28,12 +28,12 @@ def plot_stl_slice(
         A matplotlib.pyplot object
     """
 
-    if isinstance(stl_or_mesh, str):
-        if not Path(stl_or_mesh).is_file():
-            raise FileNotFoundError(f'file {stl_or_mesh} not found.')
-        mesh = trimesh.load_mesh(stl_or_mesh, process=False)
+    if isinstance(mesh_file_or_trimesh_object, str):
+        if not Path(mesh_file_or_trimesh_object).is_file():
+            raise FileNotFoundError(f'file {mesh_file_or_trimesh_object} not found.')
+        mesh = trimesh.load_mesh(mesh_file_or_trimesh_object, process=False)
     else:
-        mesh = stl_or_mesh
+        mesh = mesh_file_or_trimesh_object
 
     if plane_origin is None:
         plane_origin = mesh.centroid
@@ -65,7 +65,7 @@ def plot_stl_slice(
     return plt
 
 
-def plot_mesh(
+def plot_regular_mesh_values(
     values: np.ndarray,
     filename: Optional[str] = None,
     scale=None,  # LogNorm(),
@@ -100,6 +100,83 @@ def plot_mesh(
     # plt.close()
     return plt
 
+def plot_regular_mesh_values_with_geometry(
+    values: np.ndarray,
+    mesh_file_or_trimesh_object,
+    filename: Optional[str] = None,
+    scale=None,  # LogNorm(),
+    vmin=None,
+    label="",
+    extent=None,
+    x_label='X [cm]',
+    y_label='Y [cm]',
+    plane_origin: List[float] = None,
+    plane_normal: List[float] = [0, 0, 1],
+    rotate_plot: float = 0,
+):
+    slice = plot_geometry_mesh(
+        mesh_file_or_trimesh_object=mesh_file_or_trimesh_object,
+        plane_origin = plane_origin,
+        plane_normal = plane_normal,
+        rotate_plot = rotate_plot
+    )
+
+    both = plot_regular_mesh_values(
+        values = values,
+        filename = filename,
+        scale=scale,  # LogNorm(),
+        vmin=vmin,
+        label=label,
+        base_plt=slice,
+        extent=extent,
+        x_label=x_label,
+        y_label=y_label,
+    )
+
+    return both
+
+def plot_regular_mesh_tally(
+    tally: np.ndarray,
+    filename: Optional[str] = None,
+    scale=None,  # LogNorm(),
+    vmin=None,
+    label="",
+    base_plt=None,
+    x_label='X [cm]',
+    y_label='Y [cm]',
+):
+
+    if base_plt:
+        plt = base_plt
+    else:
+        import matplotlib.pyplot as plt
+        plt.plot()
+
+    import openmc_post_processor as opp
+    values = statepoint.process_tally(
+        tally=my_tally_1,
+    )
+
+    extent = get_tally_extent(tally)
+
+    image_map = plt.imshow(
+        values,
+        norm=scale,
+        vmin=vmin,
+        extent=extent
+    )
+
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+
+    # image_map = fig.imshow(values, norm=scale, vmin=vmin)
+    plt.colorbar(image_map, label=label)
+    if filename:
+        plt.savefig(filename, dpi=300)
+    # fig.clear()
+    # plt.close()
+    return plt
+
 def get_tally_extent(
     tally,
 ):
@@ -107,17 +184,20 @@ def get_tally_extent(
     for filter in tally.filters:
         if isinstance(filter, openmc.MeshFilter):
             mesh_filter = filter
-            print(mesh_filter)
-            print(mesh_filter.mesh.lower_left)
-            print(mesh_filter.mesh.upper_right)
-    
+            # print(mesh_filter)
+            # print(mesh_filter.mesh.lower_left)
+            # print(mesh_filter.mesh.upper_right)
+            # print(mesh_filter.mesh.width)
+            # print(mesh_filter.mesh.__dict__)
+            # print(mesh_filter.mesh.dimension)
+
     extent_x = (min(mesh_filter.mesh.lower_left[0],mesh_filter.mesh.upper_right[0]), max(mesh_filter.mesh.lower_left[0],mesh_filter.mesh.upper_right[0]))
     extent_y = (min(mesh_filter.mesh.lower_left[1],mesh_filter.mesh.upper_right[1]), max(mesh_filter.mesh.lower_left[1],mesh_filter.mesh.upper_right[1]))
     extent_z = (min(mesh_filter.mesh.lower_left[2],mesh_filter.mesh.upper_right[2]), max(mesh_filter.mesh.lower_left[2],mesh_filter.mesh.upper_right[2]))
     
-    if 1 in mesh_filter.mesh.width:
+    if 1 in mesh_filter.mesh.dimension.tolist():
         print('2d mesh tally')
-        index_of_1d = mesh_filter.mesh.width.tolist().index(1)
+        index_of_1d = mesh_filter.mesh.dimension.tolist().index(1)
         print('index', index_of_1d)
         if index_of_1d == 0:
             return extent_y + extent_z
