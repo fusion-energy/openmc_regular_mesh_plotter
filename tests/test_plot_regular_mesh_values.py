@@ -1,10 +1,13 @@
+import os
 import unittest
-from regular_mesh_plotter import plot_regular_mesh_values
-import numpy as np
+from pathlib import Path
+
 import matplotlib
+import numpy as np
+from regular_mesh_plotter import plot_regular_mesh_values
 
 
-class TestPlotRegularMeshTally(unittest.TestCase):
+class TestPlotRegularMeshValues(unittest.TestCase):
     def setUp(self):
 
         self.values = np.array(
@@ -72,8 +75,16 @@ class TestPlotRegularMeshTally(unittest.TestCase):
             ]
         )
 
-    def test_plot_regular_mesh_tally(self):
+    def test_plot_regular_mesh_values(self):
 
-        test_plot = plot_regular_mesh_values(values=self.values, filename='test.png')
+        test_plot = plot_regular_mesh_values(values=self.values)
 
         assert isinstance(test_plot, type(matplotlib.pyplot))
+
+    def test_plot_regular_mesh_values_with_output(self):
+
+        os.system('rm test.png')
+
+        plot_regular_mesh_values(values=self.values, filename='test.png')
+
+        assert Path('test.png').is_file()
