@@ -38,6 +38,7 @@ setuptools.setup(
         "trimesh",
         "shapely",
         "scipy",
-        "dagmc_geometry_slice_plotter"
+        "dagmc_geometry_slice_plotter",
+        "openmc_post_processor"
     ],
 )
