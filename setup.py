@@ -37,6 +37,7 @@ setuptools.setup(
         "matplotlib>=3.4.2",
         "trimesh",
         "shapely",
-        "scipy"
+        "scipy",
+        "dagmc_geometry_slice_plotter"
     ],
 )
