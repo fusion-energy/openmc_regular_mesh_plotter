@@ -5,6 +5,7 @@ from typing import List, Optional
 import numpy as np
 from pathlib import Path
 import dagmc_geometry_slice_plotter as dgsp
+from matplotlib import transforms
 
 import openmc_post_processor as opp
 import openmc
@@ -20,6 +21,7 @@ def plot_regular_mesh_values(
     extent=None,
     x_label="X [cm]",
     y_label="Y [cm]",
+    rotate_plot: float = 0,
 ):
 
     if base_plt:
@@ -28,7 +30,18 @@ def plot_regular_mesh_values(
         import matplotlib.pyplot as plt
 
         plt.plot()
-    image_map = plt.imshow(values, norm=scale, vmin=vmin, extent=extent)
+
+    if rotate_plot != 0:
+        x_center = sum(extent[:2]) / 2
+        y_center = sum(extent[2:]) / 2
+        base = plt.gca().transData
+        rot = transforms.Affine2D().rotate_deg_around(x_center, y_center, rotate_plot)
+
+        image_map = plt.imshow(
+            values, norm=scale, vmin=vmin, extent=extent, transform=rot + base
+        )
+    else:
+        image_map = plt.imshow(values, norm=scale, vmin=vmin, extent=extent)
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -37,8 +50,6 @@ def plot_regular_mesh_values(
     plt.colorbar(image_map, label=label)
     if filename:
         plt.savefig(filename, dpi=300)
-    # fig.clear()
-    # plt.close()
     return plt
 
 
@@ -54,14 +65,15 @@ def plot_regular_mesh_values_with_geometry(
     y_label="Y [cm]",
     plane_origin: List[float] = None,
     plane_normal: List[float] = [0, 0, 1],
-    rotate_plot: float = 0,
+    rotate_mesh: float = 0,
+    rotate_geometry: float = 0,
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
         dagmc_file_or_trimesh_object=dagmc_file_or_trimesh_object,
         plane_origin=plane_origin,
         plane_normal=plane_normal,
-        rotate_plot=rotate_plot,
+        rotate_plot=rotate_geometry,
     )
 
     both = plot_regular_mesh_values(
@@ -74,6 +86,7 @@ def plot_regular_mesh_values_with_geometry(
         extent=extent,
         x_label=x_label,
         y_label=y_label,
+        rotate_plot=rotate_mesh,
     )
 
     return both
@@ -90,14 +103,15 @@ def plot_regular_mesh_tally_with_geometry(
     y_label="Y [cm]",
     plane_origin: List[float] = None,
     plane_normal: List[float] = [0, 0, 1],
-    rotate_plot: float = 0,
+    rotate_mesh: float = 0,
+    rotate_geometry: float = 0,
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
         dagmc_file_or_trimesh_object=dagmc_file_or_trimesh_object,
         plane_origin=plane_origin,
         plane_normal=plane_normal,
-        rotate_plot=rotate_plot,
+        rotate_plot=rotate_geometry,
     )
 
     both = plot_regular_mesh_tally(
@@ -109,6 +123,7 @@ def plot_regular_mesh_tally_with_geometry(
         base_plt=slice,
         x_label=x_label,
         y_label=y_label,
+        rotate_plot=rotate_mesh,
     )
 
     return both
@@ -123,14 +138,8 @@ def plot_regular_mesh_tally(
     base_plt=None,
     x_label="X [cm]",
     y_label="Y [cm]",
+    rotate_plot: float = 0,
 ):
-
-    if base_plt:
-        plt = base_plt
-    else:
-        import matplotlib.pyplot as plt
-
-        plt.plot()
 
     values = opp.process_dose_tally(
         tally=tally,
@@ -138,20 +147,20 @@ def plot_regular_mesh_tally(
 
     extent = get_tally_extent(tally)
 
-    print("extent", extent)
+    plot = plot_regular_mesh_values(
+        values=values,
+        filename=filename,
+        scale=scale,
+        vmin=vmin,
+        label=label,
+        base_plt=base_plt,
+        extent=extent,
+        x_label=x_label,
+        y_label=y_label,
+        rotate_plot=rotate_plot,
+    )
 
-    image_map = plt.imshow(values, norm=scale, vmin=vmin, extent=extent)
-
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-
-    # image_map = fig.imshow(values, norm=scale, vmin=vmin)
-    plt.colorbar(image_map, label=label)
-    if filename:
-        plt.savefig(filename, dpi=300)
-    # fig.clear()
-    # plt.close()
-    return plt
+    return plot
 
 
 def get_tally_extent(
