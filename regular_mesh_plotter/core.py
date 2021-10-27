@@ -105,7 +105,7 @@ def plot_regular_mesh_tally_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
-    required_units='1 / simulated_particle'
+    required_units=None
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
@@ -141,20 +141,29 @@ def plot_regular_mesh_tally(
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot: float = 0,
-    required_units='1 / simulated_particle'
+    required_units=None,
+    #todo add scaling option
+    #source_strength
 ):
 
-    values = opp.process_tally(
-        tally=tally,
-        required_units=required_units
-    )
+    if required_units is not None:
+        values = opp.process_tally(
+            tally=tally,
+            required_units=required_units
+        )
+    else:
+        data_frame = tally.get_pandas_dataframe()
+        values = (
+            np.array(data_frame["mean"]),
+            np.array(data_frame["std. dev."])
+        )
 
     values = reshape_values_to_mesh_shape(tally, values)
 
     extent = get_tally_extent(tally)
 
     plot = plot_regular_mesh_values(
-        values=values,
+        values=values[0],
         filename=filename,
         scale=scale,
         vmin=vmin,
@@ -179,10 +188,14 @@ def plot_regular_mesh_dose_tally(
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot: float = 0,
+    required_units='picosievert cm **2 / simulated_particle'
+    #todo add scaling option
+    #source_strength
 ):
 
     values = opp.process_dose_tally(
         tally=tally,
+        required_units=required_units
     )
 
     values = reshape_values_to_mesh_shape(tally, values)
@@ -218,6 +231,9 @@ def plot_regular_mesh_dose_tally_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
+    required_units='picosievert cm **2 / simulated_particle'
+    #todo add scaling option
+    #source_strength
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
@@ -237,6 +253,7 @@ def plot_regular_mesh_dose_tally_with_geometry(
         x_label=x_label,
         y_label=y_label,
         rotate_plot=rotate_mesh,
+        required_units=required_units
     )
 
     return both
