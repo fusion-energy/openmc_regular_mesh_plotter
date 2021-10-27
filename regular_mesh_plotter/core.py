@@ -105,6 +105,7 @@ def plot_regular_mesh_tally_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
+    required_units='1 / simulated_particle'
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
@@ -124,6 +125,7 @@ def plot_regular_mesh_tally_with_geometry(
         x_label=x_label,
         y_label=y_label,
         rotate_plot=rotate_mesh,
+        required_units=required_units
     )
 
     return both
@@ -139,10 +141,12 @@ def plot_regular_mesh_tally(
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot: float = 0,
+    required_units='1 / simulated_particle'
 ):
 
     values = opp.process_tally(
         tally=tally,
+        required_units=required_units
     )
 
     values = reshape_values_to_mesh_shape(tally, values)
@@ -163,6 +167,7 @@ def plot_regular_mesh_tally(
     )
 
     return plot
+
 
 def plot_regular_mesh_dose_tally(
     tally,
