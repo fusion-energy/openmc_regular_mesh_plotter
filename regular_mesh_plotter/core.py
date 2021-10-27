@@ -141,9 +141,11 @@ def plot_regular_mesh_tally(
     rotate_plot: float = 0,
 ):
 
-    values = opp.process_dose_tally(
+    values = opp.process_tally(
         tally=tally,
     )
+
+    values = reshape_values_to_mesh_shape(tally, values)
 
     extent = get_tally_extent(tally)
 
@@ -161,6 +163,91 @@ def plot_regular_mesh_tally(
     )
 
     return plot
+
+def plot_regular_mesh_dose_tally(
+    tally,
+    filename: Optional[str] = None,
+    scale=None,  # LogNorm(),
+    vmin=None,
+    label="",
+    base_plt=None,
+    x_label="X [cm]",
+    y_label="Y [cm]",
+    rotate_plot: float = 0,
+):
+
+    values = opp.process_dose_tally(
+        tally=tally,
+    )
+
+    values = reshape_values_to_mesh_shape(tally, values)
+
+    extent = get_tally_extent(tally)
+
+    plot = plot_regular_mesh_values(
+        values=values,
+        filename=filename,
+        scale=scale,
+        vmin=vmin,
+        label=label,
+        base_plt=base_plt,
+        extent=extent,
+        x_label=x_label,
+        y_label=y_label,
+        rotate_plot=rotate_plot,
+    )
+
+    return plot
+
+
+def plot_regular_mesh_dose_tally_with_geometry(
+    tally,
+    dagmc_file_or_trimesh_object,
+    filename: Optional[str] = None,
+    scale=None,  # LogNorm(),
+    vmin=None,
+    label="",
+    x_label="X [cm]",
+    y_label="Y [cm]",
+    plane_origin: List[float] = None,
+    plane_normal: List[float] = [0, 0, 1],
+    rotate_mesh: float = 0,
+    rotate_geometry: float = 0,
+):
+
+    slice = dgsp.plot_slice_of_dagmc_geometry(
+        dagmc_file_or_trimesh_object=dagmc_file_or_trimesh_object,
+        plane_origin=plane_origin,
+        plane_normal=plane_normal,
+        rotate_plot=rotate_geometry,
+    )
+
+    both = plot_regular_mesh_dose_tally(
+        tally=tally,
+        filename=filename,
+        scale=scale,  # LogNorm(),
+        vmin=vmin,
+        label=label,
+        base_plt=slice,
+        x_label=x_label,
+        y_label=y_label,
+        rotate_plot=rotate_mesh,
+    )
+
+    return both
+
+
+def reshape_values_to_mesh_shape(tally, values):
+    tally_filter = tally.find_filter(filter_type=openmc.MeshFilter)
+    shape = tally_filter.mesh.dimension.tolist()
+    # 2d mesh has a shape in the form [1, 400, 400]
+    if 1 in shape:
+        shape.remove(1)
+    reshaped_values = []
+    for value in values:
+        reshaped_value = value.reshape(shape)
+        reshaped_values.append(reshaped_value)
+    return reshaped_values
 
 
 def get_tally_extent(
