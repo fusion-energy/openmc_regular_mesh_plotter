@@ -104,9 +104,28 @@ def get_values_from_tally(tally):
         )
     return values
 
+def get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value):
+
+    if std_dev_or_tally_value == 'std_dev':
+        value = reshape_values_to_mesh_shape(tally, values[1])
+    elif std_dev_or_tally_value == 'tally_value':
+        if isinstance(values, np.ndarray):
+            value = reshape_values_to_mesh_shape(tally, values)
+        elif isinstance(values, tuple):
+            value = reshape_values_to_mesh_shape(tally, values[0])
+        else:
+            msg = f'Values to plot should be a numpy ndarry or a tuple or numpy ndarrys not a {type(values)}'
+            raise ValueError(msg)
+    else:
+        msg = f'Value of std_dev_or_tally_value should be either "std_dev" or "value", not {type(values)}'
+        raise ValueError(msg)
+    
+    return value
+
 def plot_regular_mesh_tally_with_geometry(
     tally,
     dagmc_file_or_trimesh_object,
+    std_dev_or_tally_value='tally_value',
     filename: Optional[str] = None,
     scale=None,  # LogNorm(),
     vmin=None,
@@ -129,6 +148,8 @@ def plot_regular_mesh_tally_with_geometry(
         )
     else:
         values = get_values_from_tally(tally)
+    
+    value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
 
     extent = get_tally_extent(tally)
 
@@ -139,13 +160,8 @@ def plot_regular_mesh_tally_with_geometry(
         rotate_plot=rotate_geometry,
     )
 
-    if isinstance(values, np.ndarray):
-        values = reshape_values_to_mesh_shape(tally, values)
-    else:
-        values = reshape_values_to_mesh_shape(tally, values[0])
-
     plot = plot_regular_mesh_values(
-        values=values,
+        values=value,
         filename=filename,
         scale=scale,
         vmin=vmin,
@@ -156,26 +172,9 @@ def plot_regular_mesh_tally_with_geometry(
         y_label=y_label,
         rotate_plot=rotate_mesh,
     )
-    
-    elif len(values) == 2:
-        value_std_dev = reshape_values_to_mesh_shape(tally, values[1])
-        plot_std_dev = plot_regular_mesh_values(
-            values=value_std_dev,
-            filename=filename,
-            scale=scale,
-            vmin=vmin,
-            label=label,
-            base_plt=base_plt,
-            extent=extent,
-            x_label=x_label,
-            y_label=y_label,
-            rotate_plot=rotate_mesh,
-        )
-        return [plot, plot_std_dev]
-
-
 
     return plot
+
 
 
 def plot_regular_mesh_tally(
@@ -224,7 +223,6 @@ def plot_regular_mesh_tally(
 def plot_regular_mesh_dose_tally(
     tally,
     filename: Optional[str] = None,
-    filename_std_dev: Optional[str] = None,
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
@@ -314,19 +312,6 @@ def reshape_values_to_mesh_shape(tally, values):
     if 1 in shape:
         shape.remove(1)
     return values.reshape(shape)
-
-    # if isinstance(values, tuple):
-    # # values is a tupe of tally results and std dev
-    #     reshaped_values = []
-    #     for value in values:
-    #         reshaped_value = value.reshape(shape)
-    #         reshaped_values.append(reshaped_value)
-    #     return reshaped_values
-    # else:
-    # # values contains just the tally results
-    # # simulations with a sigle batch have just a tally result and no std dev 
-    #     return values.reshape(shape)
-
 
 
 def get_tally_extent(
