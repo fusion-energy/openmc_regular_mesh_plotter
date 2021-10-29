@@ -1,7 +1,7 @@
 import trimesh
 import matplotlib.pyplot as plt
 from matplotlib import transforms
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import numpy as np
 from pathlib import Path
 import dagmc_geometry_slice_plotter as dgsp
@@ -91,6 +91,18 @@ def plot_regular_mesh_values_with_geometry(
 
     return both
 
+def get_values_from_tally(tally):
+    data_frame = tally.get_pandas_dataframe()
+    if "std. dev." in data_frame.columns.to_list():
+        values = (
+            np.array(data_frame["mean"]),
+            np.array(data_frame["std. dev."])
+        )
+    else:
+        values = (
+            np.array(data_frame["mean"])
+        )
+    return values
 
 def plot_regular_mesh_tally_with_geometry(
     tally,
@@ -105,30 +117,65 @@ def plot_regular_mesh_tally_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
-    required_units=None
+    required_units=None,
+    source_strength: float = None
 ):
 
-    slice = dgsp.plot_slice_of_dagmc_geometry(
+    if required_units is not None:
+        values = opp.process_tally(
+            tally=tally,
+            required_units=required_units,
+            source_strength=source_strength
+        )
+    else:
+        values = get_values_from_tally(tally)
+
+    extent = get_tally_extent(tally)
+
+    base_plt = dgsp.plot_slice_of_dagmc_geometry(
         dagmc_file_or_trimesh_object=dagmc_file_or_trimesh_object,
         plane_origin=plane_origin,
         plane_normal=plane_normal,
         rotate_plot=rotate_geometry,
     )
 
-    both = plot_regular_mesh_tally(
-        tally=tally,
+    if isinstance(values, np.ndarray):
+        values = reshape_values_to_mesh_shape(tally, values)
+    else:
+        values = reshape_values_to_mesh_shape(tally, values[0])
+
+    plot = plot_regular_mesh_values(
+        values=values,
         filename=filename,
-        scale=scale,  # LogNorm(),
+        scale=scale,
         vmin=vmin,
         label=label,
-        base_plt=slice,
+        base_plt=base_plt,
+        extent=extent,
         x_label=x_label,
         y_label=y_label,
         rotate_plot=rotate_mesh,
-        required_units=required_units
     )
+    
+    elif len(values) == 2:
+        value_std_dev = reshape_values_to_mesh_shape(tally, values[1])
+        plot_std_dev = plot_regular_mesh_values(
+            values=value_std_dev,
+            filename=filename,
+            scale=scale,
+            vmin=vmin,
+            label=label,
+            base_plt=base_plt,
+            extent=extent,
+            x_label=x_label,
+            y_label=y_label,
+            rotate_plot=rotate_mesh,
+        )
+        return [plot, plot_std_dev]
 
-    return both
+
+
+    return plot
 
 
 def plot_regular_mesh_tally(
@@ -141,22 +188,18 @@ def plot_regular_mesh_tally(
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot: float = 0,
-    required_units=None,
-    #todo add scaling option
-    #source_strength
+    required_units: str = None,
+    source_strength: float = None,
 ):
 
     if required_units is not None:
         values = opp.process_tally(
             tally=tally,
-            required_units=required_units
+            required_units=required_units,
+            source_strength=source_strength
         )
     else:
-        data_frame = tally.get_pandas_dataframe()
-        values = (
-            np.array(data_frame["mean"]),
-            np.array(data_frame["std. dev."])
-        )
+        values = get_values_from_tally(tally)
 
     values = reshape_values_to_mesh_shape(tally, values)
 
@@ -181,6 +224,7 @@ def plot_regular_mesh_tally(
 def plot_regular_mesh_dose_tally(
     tally,
     filename: Optional[str] = None,
+    filename_std_dev: Optional[str] = None,
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
@@ -188,22 +232,26 @@ def plot_regular_mesh_dose_tally(
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot: float = 0,
-    required_units='picosievert cm **2 / simulated_particle'
-    #todo add scaling option
-    #source_strength
+    required_units='picosievert cm **2 / simulated_particle',
+    source_strength: float = None,
 ):
 
-    values = opp.process_dose_tally(
-        tally=tally,
-        required_units=required_units
-    )
+    if required_units is not None:
+        values = opp.process_dose_tally(
+            tally=tally,
+            required_units=required_units,
+            source_strength=source_strength
+        )
+    else:
+        values = get_values_from_tally(tally)
 
     values = reshape_values_to_mesh_shape(tally, values)
 
     extent = get_tally_extent(tally)
 
+    if len
     plot = plot_regular_mesh_values(
-        values=values,
+        values=values[0],
         filename=filename,
         scale=scale,
         vmin=vmin,
@@ -231,9 +279,8 @@ def plot_regular_mesh_dose_tally_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
-    required_units='picosievert cm **2 / simulated_particle'
-    #todo add scaling option
-    #source_strength
+    required_units='picosievert cm **2 / simulated_particle',
+    source_strength: float = None,
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
@@ -253,7 +300,8 @@ def plot_regular_mesh_dose_tally_with_geometry(
         x_label=x_label,
         y_label=y_label,
         rotate_plot=rotate_mesh,
-        required_units=required_units
+        required_units=required_units,
+        source_strength=source_strength
     )
 
     return both
@@ -265,11 +313,20 @@ def reshape_values_to_mesh_shape(tally, values):
     # 2d mesh has a shape in the form [1, 400, 400]
     if 1 in shape:
         shape.remove(1)
-    reshaped_values = []
-    for value in values:
-        reshaped_value = value.reshape(shape)
-        reshaped_values.append(reshaped_value)
-    return reshaped_values
+    return values.reshape(shape)
+
+    # if isinstance(values, tuple):
+    # # values is a tupe of tally results and std dev
+    #     reshaped_values = []
+    #     for value in values:
+    #         reshaped_value = value.reshape(shape)
+    #         reshaped_values.append(reshaped_value)
+    #     return reshaped_values
+    # else:
+    # # values contains just the tally results
+    # # simulations with a sigle batch have just a tally result and no std dev 
+    #     return values.reshape(shape)
+
 
 
 def get_tally_extent(
