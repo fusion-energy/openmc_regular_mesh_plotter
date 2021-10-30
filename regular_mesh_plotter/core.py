@@ -1,7 +1,7 @@
 import trimesh
 import matplotlib.pyplot as plt
 from matplotlib import transforms
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import numpy as np
 from pathlib import Path
 import dagmc_geometry_slice_plotter as dgsp
@@ -91,10 +91,41 @@ def plot_regular_mesh_values_with_geometry(
 
     return both
 
+def get_values_from_tally(tally):
+    data_frame = tally.get_pandas_dataframe()
+    if "std. dev." in data_frame.columns.to_list():
+        values = (
+            np.array(data_frame["mean"]),
+            np.array(data_frame["std. dev."])
+        )
+    else:
+        values = (
+            np.array(data_frame["mean"])
+        )
+    return values
+
+def get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value):
+
+    if std_dev_or_tally_value == 'std_dev':
+        value = reshape_values_to_mesh_shape(tally, values[1])
+    elif std_dev_or_tally_value == 'tally_value':
+        if isinstance(values, np.ndarray):
+            value = reshape_values_to_mesh_shape(tally, values)
+        elif isinstance(values, tuple):
+            value = reshape_values_to_mesh_shape(tally, values[0])
+        else:
+            msg = f'Values to plot should be a numpy ndarry or a tuple or numpy ndarrys not a {type(values)}'
+            raise ValueError(msg)
+    else:
+        msg = f'Value of std_dev_or_tally_value should be either "std_dev" or "value", not {type(values)}'
+        raise ValueError(msg)
+    
+    return value
 
 def plot_regular_mesh_tally_with_geometry(
     tally,
     dagmc_file_or_trimesh_object,
+    std_dev_or_tally_value='tally_value',
     filename: Optional[str] = None,
     scale=None,  # LogNorm(),
     vmin=None,
@@ -105,30 +136,45 @@ def plot_regular_mesh_tally_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
-    required_units=None
+    required_units=None,
+    source_strength: float = None
 ):
 
-    slice = dgsp.plot_slice_of_dagmc_geometry(
+    if required_units is not None:
+        values = opp.process_tally(
+            tally=tally,
+            required_units=required_units,
+            source_strength=source_strength
+        )
+    else:
+        values = get_values_from_tally(tally)
+    
+    value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
+
+    extent = get_tally_extent(tally)
+
+    base_plt = dgsp.plot_slice_of_dagmc_geometry(
         dagmc_file_or_trimesh_object=dagmc_file_or_trimesh_object,
         plane_origin=plane_origin,
         plane_normal=plane_normal,
         rotate_plot=rotate_geometry,
     )
 
-    both = plot_regular_mesh_tally(
-        tally=tally,
+    plot = plot_regular_mesh_values(
+        values=value,
         filename=filename,
-        scale=scale,  # LogNorm(),
+        scale=scale,
         vmin=vmin,
         label=label,
-        base_plt=slice,
+        base_plt=base_plt,
+        extent=extent,
         x_label=x_label,
         y_label=y_label,
         rotate_plot=rotate_mesh,
-        required_units=required_units
     )
 
-    return both
+    return plot
+
 
 
 def plot_regular_mesh_tally(
@@ -141,22 +187,18 @@ def plot_regular_mesh_tally(
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot: float = 0,
-    required_units=None,
-    #todo add scaling option
-    #source_strength
+    required_units: str = None,
+    source_strength: float = None,
 ):
 
     if required_units is not None:
         values = opp.process_tally(
             tally=tally,
-            required_units=required_units
+            required_units=required_units,
+            source_strength=source_strength
         )
     else:
-        data_frame = tally.get_pandas_dataframe()
-        values = (
-            np.array(data_frame["mean"]),
-            np.array(data_frame["std. dev."])
-        )
+        values = get_values_from_tally(tally)
 
     values = reshape_values_to_mesh_shape(tally, values)
 
@@ -188,22 +230,26 @@ def plot_regular_mesh_dose_tally(
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot: float = 0,
-    required_units='picosievert cm **2 / simulated_particle'
-    #todo add scaling option
-    #source_strength
+    required_units='picosievert cm **2 / simulated_particle',
+    source_strength: float = None,
 ):
 
-    values = opp.process_dose_tally(
-        tally=tally,
-        required_units=required_units
-    )
+    if required_units is not None:
+        values = opp.process_dose_tally(
+            tally=tally,
+            required_units=required_units,
+            source_strength=source_strength
+        )
+    else:
+        values = get_values_from_tally(tally)
 
     values = reshape_values_to_mesh_shape(tally, values)
 
     extent = get_tally_extent(tally)
 
+    if len
     plot = plot_regular_mesh_values(
-        values=values,
+        values=values[0],
         filename=filename,
         scale=scale,
         vmin=vmin,
@@ -231,9 +277,8 @@ def plot_regular_mesh_dose_tally_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
-    required_units='picosievert cm **2 / simulated_particle'
-    #todo add scaling option
-    #source_strength
+    required_units='picosievert cm **2 / simulated_particle',
+    source_strength: float = None,
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
@@ -253,7 +298,8 @@ def plot_regular_mesh_dose_tally_with_geometry(
         x_label=x_label,
         y_label=y_label,
         rotate_plot=rotate_mesh,
-        required_units=required_units
+        required_units=required_units,
+        source_strength=source_strength
     )
 
     return both
@@ -265,11 +311,7 @@ def reshape_values_to_mesh_shape(tally, values):
     # 2d mesh has a shape in the form [1, 400, 400]
     if 1 in shape:
         shape.remove(1)
-    reshaped_values = []
-    for value in values:
-        reshaped_value = value.reshape(shape)
-        reshaped_values.append(reshaped_value)
-    return reshaped_values
+    return values.reshape(shape)
 
 
 def get_tally_extent(
