@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Shimwell"
+  given-names: "Jonathan"
+  orcid: "https://orcid.org/0000-0001-6909-0946"
+title: "A Python package for plotting regular mesh tally results from neutronics simulations."
+version: 0.1.0
+date-released: 2021-10-30
+url: "https://github.com/fusion-energy/regular_mesh_plotter"
