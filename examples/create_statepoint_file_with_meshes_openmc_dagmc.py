@@ -39,7 +39,7 @@ materials = odw.Materials(
 tally1 = odw.MeshTally2D(
     tally_type="neutron_effective_dose",
     plane="xy",
-    mesh_resolution=(10, ),
+    mesh_resolution=(10, 5),
     bounding_box="dagmc.h5m",
 )
 tally2 = odw.MeshTally2D(
@@ -57,7 +57,7 @@ tally3 = odw.MeshTally2D(
 tally4 = odw.MeshTally2D(
     tally_type="neutron_effective_dose",
     plane="xy",
-    mesh_resolution=(10, ),
+    mesh_resolution=(10, 10),
     bounding_box="dagmc.h5m",
 )
 tally5 = odw.MeshTally2D(
