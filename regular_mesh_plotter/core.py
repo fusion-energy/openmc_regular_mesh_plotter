@@ -107,18 +107,22 @@ def get_values_from_tally(tally):
 def get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value):
 
     if std_dev_or_tally_value == 'std_dev':
-        value = reshape_values_to_mesh_shape(tally, values[1])
+        value_index = 1
     elif std_dev_or_tally_value == 'tally_value':
-        if isinstance(values, np.ndarray):
-            value = reshape_values_to_mesh_shape(tally, values)
-        elif isinstance(values, tuple):
-            value = reshape_values_to_mesh_shape(tally, values[0])
-        else:
-            msg = f'Values to plot should be a numpy ndarry or a tuple or numpy ndarrys not a {type(values)}'
-            raise ValueError(msg)
+        value_index = 0
     else:
         msg = f'Value of std_dev_or_tally_value should be either "std_dev" or "value", not {type(values)}'
         raise ValueError(msg)
+
+    if isinstance(values, tuple):
+        value = reshape_values_to_mesh_shape(tally, values[value_index])
+    elif isinstance(values, np.ndarray):
+        value = reshape_values_to_mesh_shape(tally, values)
+    else:  # isinstance(values, np.ndarray):
+        value = reshape_values_to_mesh_shape(tally, values.magnitude)
+        # else:
+        #     msg = f'Values to plot should be a numpy ndarry or a tuple or numpy ndarrys not a {type(values)}'
+        #     raise ValueError(msg)
     
     return value
 
@@ -189,6 +193,7 @@ def plot_regular_mesh_tally(
     rotate_plot: float = 0,
     required_units: str = None,
     source_strength: float = None,
+    std_dev_or_tally_value='tally_value',
 ):
 
     if required_units is not None:
@@ -199,13 +204,15 @@ def plot_regular_mesh_tally(
         )
     else:
         values = get_values_from_tally(tally)
+    
+    value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
 
-    values = reshape_values_to_mesh_shape(tally, values)
+    value = reshape_values_to_mesh_shape(tally, value)
 
     extent = get_tally_extent(tally)
 
     plot = plot_regular_mesh_values(
-        values=values[0],
+        values=value,
         filename=filename,
         scale=scale,
         vmin=vmin,
@@ -232,6 +239,7 @@ def plot_regular_mesh_dose_tally(
     rotate_plot: float = 0,
     required_units='picosievert cm **2 / simulated_particle',
     source_strength: float = None,
+    std_dev_or_tally_value: str = 'tally_value',
 ):
 
     if required_units is not None:
@@ -243,13 +251,14 @@ def plot_regular_mesh_dose_tally(
     else:
         values = get_values_from_tally(tally)
 
-    values = reshape_values_to_mesh_shape(tally, values)
+    value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
+
+    value = reshape_values_to_mesh_shape(tally, value)
 
     extent = get_tally_extent(tally)
 
-    if len
     plot = plot_regular_mesh_values(
-        values=values[0],
+        values=value,
         filename=filename,
         scale=scale,
         vmin=vmin,
@@ -279,6 +288,7 @@ def plot_regular_mesh_dose_tally_with_geometry(
     rotate_geometry: float = 0,
     required_units='picosievert cm **2 / simulated_particle',
     source_strength: float = None,
+    std_dev_or_tally_value: str = 'tally_value',
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
@@ -299,7 +309,8 @@ def plot_regular_mesh_dose_tally_with_geometry(
         y_label=y_label,
         rotate_plot=rotate_mesh,
         required_units=required_units,
-        source_strength=source_strength
+        source_strength=source_strength,
+        std_dev_or_tally_value=std_dev_or_tally_value,
     )
 
     return both
@@ -321,12 +332,6 @@ def get_tally_extent(
     for filter in tally.filters:
         if isinstance(filter, openmc.MeshFilter):
             mesh_filter = filter
-            # print(mesh_filter)
-            # print(mesh_filter.mesh.lower_left)
-            # print(mesh_filter.mesh.upper_right)
-            # print(mesh_filter.mesh.width)
-            # print(mesh_filter.mesh.__dict__)
-            # print(mesh_filter.mesh.dimension)
 
     extent_x = (
         min(mesh_filter.mesh.lower_left[0], mesh_filter.mesh.upper_right[0]),
