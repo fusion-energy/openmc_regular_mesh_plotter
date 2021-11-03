@@ -6,8 +6,12 @@ import numpy as np
 import openmc_post_processor as opp
 from matplotlib import transforms
 
-from .utils import (get_std_dev_or_value_from_tally, get_tally_extent,
-                    get_values_from_tally, reshape_values_to_mesh_shape)
+from .utils import (
+    get_std_dev_or_value_from_tally,
+    get_tally_extent,
+    get_values_from_tally,
+    reshape_values_to_mesh_shape,
+)
 
 
 def plot_regular_mesh_values(

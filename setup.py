@@ -39,6 +39,6 @@ setuptools.setup(
         "shapely",
         "scipy",
         "dagmc_geometry_slice_plotter",
-        "openmc_post_processor"
+        "openmc_post_processor",
     ],
 )
