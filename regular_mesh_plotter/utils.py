@@ -84,4 +84,3 @@ def get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value):
         #     raise ValueError(msg)
 
     return value
-

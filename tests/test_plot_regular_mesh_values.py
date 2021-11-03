@@ -83,8 +83,8 @@ class TestPlotRegularMeshValues(unittest.TestCase):
 
     def test_plot_regular_mesh_values_with_output(self):
 
-        os.system('rm test.png')
+        os.system("rm test.png")
 
-        plot_regular_mesh_values(values=self.values, filename='test.png')
+        plot_regular_mesh_values(values=self.values, filename="test.png")
 
-        assert Path('test.png').is_file()
+        assert Path("test.png").is_file()

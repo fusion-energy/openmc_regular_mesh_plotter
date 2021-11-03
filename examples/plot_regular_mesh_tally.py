@@ -1,4 +1,3 @@
-
 import regular_mesh_plotter as rmp
 import openmc
 
@@ -11,7 +10,7 @@ my_tally = statepoint.get_tally(name="neutron_effective_dose_on_2D_mesh_xy")
 # creates a plot of the mesh
 rmp.plot_regular_mesh_tally(
     tally=my_tally,
-    filename= 'neutron_effective_dose_on_2D_mesh_xy.png',
+    filename="neutron_effective_dose_on_2D_mesh_xy.png",
     scale=None,  # LogNorm(),
     vmin=None,
     label="",

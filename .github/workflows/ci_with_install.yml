@@ -20,7 +20,8 @@ jobs:
   testing:
     runs-on: ubuntu-latest
     container:
-      image: continuumio/miniconda3:4.9.2
+      # image: openmc/openmc:latest-dagmc is missing the dagmc universe
+      image: openmc/openmc:develop-dagmc
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -29,17 +30,27 @@ jobs:
         run: |
           python setup.py install
 
-      - name: install openmc
-        run: |
-          conda install -c conda-forge openmc
-
       - name: install packages for tests
         run: |
           pip install -r requirements-test.txt 
 
       - name: Run test_utils
         run: |
+          cp tests/example.stl .
           pytest tests/ -v --cov=regular_mesh_plotter --cov-append --cov-report term --cov-report xml
 
       - name: Upload to codecov
         uses: codecov/codecov-action@v2
+
+      - name: Run examples
+        run: |
+          cd examples
+          python create_statepoint_file_with_meshes_openmc_dagmc.py
+          python create_statepoint_file_with_meshes_openmc.py
+          # python examples_from_readme.py  # commented out as it requires entire neutronics workflow
+          python plot_regular_mesh_dose_tally.py
+          python plot_regular_mesh_dose_tally_with_geometry.py
+          python plot_regular_mesh_tally.py
+          python plot_regular_mesh_tally_with_geometry.py
+          python plot_regular_mesh_values.py
+          python plot_regular_mesh_values_with_geometry.py
