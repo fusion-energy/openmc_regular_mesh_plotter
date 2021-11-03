@@ -20,7 +20,7 @@ jobs:
   testing:
     runs-on: ubuntu-latest
     container:
-      image: openmc/openmc-dagmc:latest
+      image: openmc/openmc:latest-dagmc
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
