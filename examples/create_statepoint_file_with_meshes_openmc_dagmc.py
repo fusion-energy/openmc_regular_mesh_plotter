@@ -4,15 +4,15 @@
 import openmc
 import openmc_dagmc_wrapper as odw
 import openmc_plasma_source as ops
-import paramak
 from stl_to_h5m import stl_to_h5m
 
-my_shape = paramak.ExtrudeStraightShape(
-    points=[(1, 1), (1, 200), (600, 200), (600, 1)],
-    distance=180,
-)
-
-my_shape.export_stl("example.stl")
+# code used to create example.stl
+# import paramak
+# my_shape = paramak.ExtrudeStraightShape(
+#     points=[(1, 1), (1, 200), (600, 200), (600, 1)],
+#     distance=180,
+# )
+# my_shape.export_stl("example.stl")
 
 # This script converts the CAD stl files generated into h5m files that can be
 # used in DAGMC enabled codes. h5m files created in this way are imprinted,
