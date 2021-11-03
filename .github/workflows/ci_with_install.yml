@@ -20,7 +20,7 @@ jobs:
   testing:
     runs-on: ubuntu-latest
     container:
-      image: continuumio/miniconda3:4.9.2
+      image: openmc/openmc:latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -28,10 +28,6 @@ jobs:
       - name: install package
         run: |
           python setup.py install
-
-      - name: install openmc
-        run: |
-          conda install -c conda-forge openmc
 
       - name: install packages for tests
         run: |
@@ -43,3 +39,16 @@ jobs:
 
       - name: Upload to codecov
         uses: codecov/codecov-action@v2
+
+      - name: Run examples
+        run: |
+          cd examples
+          python examples/create_statepoint_file_with_meshes_openmc_dagmc.py
+          python examples/create_statepoint_file_with_meshes_openmc.py
+          # python examples/examples_from_readme.py  # commented out as it requires entire neutronics workflow
+          python examples/plot_regular_mesh_dose_tally.py
+          python examples/plot_regular_mesh_dose_tally_with_geometry.py
+          python examples/plot_regular_mesh_tally.py
+          python examples/plot_regular_mesh_tally_with_geometry.py
+          python examples/plot_regular_mesh_values.py
+          python examples/plot_regular_mesh_values_with_geometry.py
