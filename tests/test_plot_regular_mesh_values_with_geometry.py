@@ -79,7 +79,7 @@ class TestPlotRegularMeshValuesWithGeometry(unittest.TestCase):
 
         test_plot = plot_regular_mesh_values_with_geometry(
             values=self.values,
-            dagmc_file_or_trimesh_object='example.stl'  # this could be a h5m file
+            dagmc_file_or_trimesh_object="example.stl",  # this could be a h5m file
         )
 
         assert isinstance(test_plot, type(matplotlib.pyplot))
@@ -88,9 +88,9 @@ class TestPlotRegularMeshValuesWithGeometry(unittest.TestCase):
 
         test_plot = plot_regular_mesh_values_with_geometry(
             values=self.values,
-            dagmc_file_or_trimesh_object='example.stl',  # this could be a h5m file
-            filename='test.png'
+            dagmc_file_or_trimesh_object="example.stl",  # this could be a h5m file
+            filename="test.png",
         )
 
         assert isinstance(test_plot, type(matplotlib.pyplot))
-        assert Path('test.png').is_file()
+        assert Path("test.png").is_file()

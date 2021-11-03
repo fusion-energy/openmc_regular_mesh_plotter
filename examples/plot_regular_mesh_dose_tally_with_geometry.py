@@ -11,18 +11,18 @@ my_tally = statepoint.get_tally(name="neutron_effective_dose_on_2D_mesh_xy")
 my_plot = rmp.plot_regular_mesh_dose_tally_with_geometry(
     tally=my_tally,
     dagmc_file_or_trimesh_object="dagmc.h5m",
-    filename = 'plot_regular_mesh_dose_tally_with_geometry.png',
+    filename="plot_regular_mesh_dose_tally_with_geometry.png",
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
     x_label="X [cm]",
     y_label="Y [cm]",
-    plane_origin = None,  # this could be skipped as it defaults to None, which uses the center of the mesh
-    plane_normal = [0, 0, 1],
-    rotate_mesh = 0,
-    rotate_geometry = 0,
-    required_units='picosievert cm **2 / simulated_particle',
-    source_strength = None,
+    plane_origin=None,  # this could be skipped as it defaults to None, which uses the center of the mesh
+    plane_normal=[0, 0, 1],
+    rotate_mesh=0,
+    rotate_geometry=0,
+    required_units="picosievert cm **2 / simulated_particle",
+    source_strength=None,
 )
 
 my_plot.show()

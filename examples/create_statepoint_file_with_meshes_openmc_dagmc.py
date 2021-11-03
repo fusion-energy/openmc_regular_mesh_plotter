@@ -4,15 +4,15 @@
 import openmc
 import openmc_dagmc_wrapper as odw
 import openmc_plasma_source as ops
-import paramak
 from stl_to_h5m import stl_to_h5m
 
-my_shape = paramak.ExtrudeStraightShape(
-    points=[(1, 1), (1, 200), (600, 200), (600, 1)],
-    distance=180,
-)
-
-my_shape.export_stl("example.stl")
+# code used to create example.stl
+# import paramak
+# my_shape = paramak.ExtrudeStraightShape(
+#     points=[(1, 1), (1, 200), (600, 200), (600, 1)],
+#     distance=180,
+# )
+# my_shape.export_stl("example.stl")
 
 # This script converts the CAD stl files generated into h5m files that can be
 # used in DAGMC enabled codes. h5m files created in this way are imprinted,
@@ -33,13 +33,13 @@ geometry = odw.Geometry(
 )
 
 materials = odw.Materials(
-    h5m_filename="dagmc.h5m", correspondence_dict={"mat1": "eurofer"}
+    h5m_filename="dagmc.h5m", correspondence_dict={"mat1": "FLiNaK"}
 )
 
 tally1 = odw.MeshTally2D(
     tally_type="neutron_effective_dose",
     plane="xy",
-    mesh_resolution=(10, ),
+    mesh_resolution=(10, 5),
     bounding_box="dagmc.h5m",
 )
 tally2 = odw.MeshTally2D(
@@ -57,7 +57,7 @@ tally3 = odw.MeshTally2D(
 tally4 = odw.MeshTally2D(
     tally_type="neutron_effective_dose",
     plane="xy",
-    mesh_resolution=(10, ),
+    mesh_resolution=(10, 10),
     bounding_box="dagmc.h5m",
 )
 tally5 = odw.MeshTally2D(

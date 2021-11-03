@@ -1,14 +1,17 @@
-import trimesh
-import matplotlib.pyplot as plt
-from matplotlib import transforms
-from typing import List, Optional, Tuple
-import numpy as np
-from pathlib import Path
+from typing import List, Optional
+
 import dagmc_geometry_slice_plotter as dgsp
+import matplotlib.pyplot as plt
+import numpy as np
+import openmc_post_processor as opp
 from matplotlib import transforms
 
-import openmc_post_processor as opp
-import openmc
+from .utils import (
+    get_std_dev_or_value_from_tally,
+    get_tally_extent,
+    get_values_from_tally,
+    reshape_values_to_mesh_shape,
+)
 
 
 def plot_regular_mesh_values(
@@ -91,45 +94,11 @@ def plot_regular_mesh_values_with_geometry(
 
     return both
 
-def get_values_from_tally(tally):
-    data_frame = tally.get_pandas_dataframe()
-    if "std. dev." in data_frame.columns.to_list():
-        values = (
-            np.array(data_frame["mean"]),
-            np.array(data_frame["std. dev."])
-        )
-    else:
-        values = (
-            np.array(data_frame["mean"])
-        )
-    return values
-
-def get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value):
-
-    if std_dev_or_tally_value == 'std_dev':
-        value_index = 1
-    elif std_dev_or_tally_value == 'tally_value':
-        value_index = 0
-    else:
-        msg = f'Value of std_dev_or_tally_value should be either "std_dev" or "value", not {type(values)}'
-        raise ValueError(msg)
-
-    if isinstance(values, tuple):
-        value = reshape_values_to_mesh_shape(tally, values[value_index])
-    elif isinstance(values, np.ndarray):
-        value = reshape_values_to_mesh_shape(tally, values)
-    else:  # isinstance(values, np.ndarray):
-        value = reshape_values_to_mesh_shape(tally, values.magnitude)
-        # else:
-        #     msg = f'Values to plot should be a numpy ndarry or a tuple or numpy ndarrys not a {type(values)}'
-        #     raise ValueError(msg)
-    
-    return value
 
 def plot_regular_mesh_tally_with_geometry(
     tally,
     dagmc_file_or_trimesh_object,
-    std_dev_or_tally_value='tally_value',
+    std_dev_or_tally_value="tally_value",
     filename: Optional[str] = None,
     scale=None,  # LogNorm(),
     vmin=None,
@@ -141,18 +110,16 @@ def plot_regular_mesh_tally_with_geometry(
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
     required_units=None,
-    source_strength: float = None
+    source_strength: float = None,
 ):
 
     if required_units is not None:
         values = opp.process_tally(
-            tally=tally,
-            required_units=required_units,
-            source_strength=source_strength
+            tally=tally, required_units=required_units, source_strength=source_strength
         )
     else:
         values = get_values_from_tally(tally)
-    
+
     value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
 
     extent = get_tally_extent(tally)
@@ -180,7 +147,6 @@ def plot_regular_mesh_tally_with_geometry(
     return plot
 
 
-
 def plot_regular_mesh_tally(
     tally,
     filename: Optional[str] = None,
@@ -193,18 +159,16 @@ def plot_regular_mesh_tally(
     rotate_plot: float = 0,
     required_units: str = None,
     source_strength: float = None,
-    std_dev_or_tally_value='tally_value',
+    std_dev_or_tally_value="tally_value",
 ):
 
     if required_units is not None:
         values = opp.process_tally(
-            tally=tally,
-            required_units=required_units,
-            source_strength=source_strength
+            tally=tally, required_units=required_units, source_strength=source_strength
         )
     else:
         values = get_values_from_tally(tally)
-    
+
     value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
 
     value = reshape_values_to_mesh_shape(tally, value)
@@ -237,16 +201,14 @@ def plot_regular_mesh_dose_tally(
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot: float = 0,
-    required_units='picosievert cm **2 / simulated_particle',
+    required_units="picosievert cm **2 / simulated_particle",
     source_strength: float = None,
-    std_dev_or_tally_value: str = 'tally_value',
+    std_dev_or_tally_value: str = "tally_value",
 ):
 
     if required_units is not None:
         values = opp.process_dose_tally(
-            tally=tally,
-            required_units=required_units,
-            source_strength=source_strength
+            tally=tally, required_units=required_units, source_strength=source_strength
         )
     else:
         values = get_values_from_tally(tally)
@@ -286,9 +248,9 @@ def plot_regular_mesh_dose_tally_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
-    required_units='picosievert cm **2 / simulated_particle',
+    required_units="picosievert cm **2 / simulated_particle",
     source_strength: float = None,
-    std_dev_or_tally_value: str = 'tally_value',
+    std_dev_or_tally_value: str = "tally_value",
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
@@ -314,46 +276,3 @@ def plot_regular_mesh_dose_tally_with_geometry(
     )
 
     return both
-
-
-def reshape_values_to_mesh_shape(tally, values):
-    tally_filter = tally.find_filter(filter_type=openmc.MeshFilter)
-    shape = tally_filter.mesh.dimension.tolist()
-    # 2d mesh has a shape in the form [1, 400, 400]
-    if 1 in shape:
-        shape.remove(1)
-    return values.reshape(shape)
-
-
-def get_tally_extent(
-    tally,
-):
-
-    for filter in tally.filters:
-        if isinstance(filter, openmc.MeshFilter):
-            mesh_filter = filter
-
-    extent_x = (
-        min(mesh_filter.mesh.lower_left[0], mesh_filter.mesh.upper_right[0]),
-        max(mesh_filter.mesh.lower_left[0], mesh_filter.mesh.upper_right[0]),
-    )
-    extent_y = (
-        min(mesh_filter.mesh.lower_left[1], mesh_filter.mesh.upper_right[1]),
-        max(mesh_filter.mesh.lower_left[1], mesh_filter.mesh.upper_right[1]),
-    )
-    extent_z = (
-        min(mesh_filter.mesh.lower_left[2], mesh_filter.mesh.upper_right[2]),
-        max(mesh_filter.mesh.lower_left[2], mesh_filter.mesh.upper_right[2]),
-    )
-
-    if 1 in mesh_filter.mesh.dimension.tolist():
-        print("2d mesh tally")
-        index_of_1d = mesh_filter.mesh.dimension.tolist().index(1)
-        print("index", index_of_1d)
-        if index_of_1d == 0:
-            return extent_y + extent_z
-        if index_of_1d == 1:
-            return extent_x + extent_z
-        if index_of_1d == 2:
-            return extent_x + extent_y
-    return None
