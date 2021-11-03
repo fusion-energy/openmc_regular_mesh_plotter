@@ -18,7 +18,7 @@ Mesh results in the form of Numpy arrays or OpenMC.tally objects can be plotted
 with a single API call.
 
 A Matplotlib.pyplot object is returned by all functions so one can make changes
-to the legend, axis, colour map etc. However some key options are accessable
+to the legend, axis, colour map etc. However some key options are accessible
 in the function call directly.
 
 There are additional options that allow

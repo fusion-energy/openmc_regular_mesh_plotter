@@ -33,7 +33,7 @@ geometry = odw.Geometry(
 )
 
 materials = odw.Materials(
-    h5m_filename="dagmc.h5m", correspondence_dict={"mat1": "eurofer"}
+    h5m_filename="dagmc.h5m", correspondence_dict={"mat1": "FLiNaK"}
 )
 
 tally1 = odw.MeshTally2D(
