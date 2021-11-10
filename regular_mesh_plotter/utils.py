@@ -55,11 +55,19 @@ def get_values_from_tally(tally):
     dateframe) is also returned"""
 
     data_frame = tally.get_pandas_dataframe()
-    if "std. dev." in data_frame.columns.to_list():
+    if "std. dev." in get_data_frame_columns(data_frame):
         values = (np.array(data_frame["mean"]), np.array(data_frame["std. dev."]))
     else:
         values = np.array(data_frame["mean"])
     return values
+
+
+def get_data_frame_columns(data_frame):
+    if isinstance(data_frame.columns, pd.MultiIndex):
+        data_frame_columns = data_frame.columns.get_level_values(0).to_list()
+    else:
+        data_frame_columns = data_frame.columns.to_list()
+    return data_frame_columns
 
 
 def get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value):

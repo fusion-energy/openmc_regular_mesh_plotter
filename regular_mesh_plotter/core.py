@@ -207,11 +207,15 @@ def plot_regular_mesh_dose_tally(
 ):
 
     if required_units is not None:
+        print("equired_units is not None")
         values = opp.process_dose_tally(
             tally=tally, required_units=required_units, source_strength=source_strength
         )
     else:
+        print("required_units is None")
         values = get_values_from_tally(tally)
+
+    print(len(values))
 
     value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
 
