@@ -18,7 +18,7 @@ my_plot = rmp.plot_regular_mesh_dose_tally(
     rotate_plot=0,
     required_units="picosievert / simulated_particle",
     source_strength=None,
-    label='Effective dose [picosievert / simulated_particle]'
+    label="Effective dose [picosievert / simulated_particle]",
 )
 
 # displays the plot

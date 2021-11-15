@@ -14,7 +14,7 @@ my_plot = rmp.plot_regular_mesh_dose_tally_with_geometry(
     filename="plot_regular_mesh_dose_tally_with_geometry.png",
     scale=None,  # LogNorm(),
     vmin=None,
-    label='Effective dose [picosievert / second]',
+    label="Effective dose [picosievert / second]",
     x_label="X [cm]",
     y_label="Y [cm]",
     plane_origin=None,  # this could be skipped as it defaults to None, which uses the center of the mesh
@@ -22,7 +22,7 @@ my_plot = rmp.plot_regular_mesh_dose_tally_with_geometry(
     rotate_mesh=0,
     rotate_geometry=0,
     required_units="picosievert / second",
-    source_strength=1e20
+    source_strength=1e20,
 )
 
 my_plot.show()
