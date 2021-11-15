@@ -38,7 +38,8 @@ setuptools.setup(
         "trimesh",
         "shapely",
         "scipy",
+        "pandas",
         "dagmc_geometry_slice_plotter",
-        "openmc_post_processor",
+        "openmc_tally_unit_converter",
     ],
 )
