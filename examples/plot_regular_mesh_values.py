@@ -1,3 +1,4 @@
+from matplotlib.pyplot import contour
 import regular_mesh_plotter as rmp
 import numpy as np
 
@@ -67,7 +68,7 @@ values = np.array(
 )
 
 # creates a plot of the array
-rmp.plot_regular_mesh_values(
+plot = rmp.plot_regular_mesh_values(
     values=values,
     filename="plot_regular_mesh_values.png",
     scale=None,  # LogNorm(),
@@ -75,4 +76,7 @@ rmp.plot_regular_mesh_values(
     label="legend label",
     x_label="X [cm]",
     y_label="Y [cm]",
+    contours=[2e8, 2e9, 2e10,]
 )
+
+# plot.show()
