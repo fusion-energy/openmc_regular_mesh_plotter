@@ -3,7 +3,7 @@ from typing import List, Optional
 import dagmc_geometry_slice_plotter as dgsp
 import matplotlib.pyplot as plt
 import numpy as np
-import openmc_post_processor as opp
+import openmc_tally_unit_convertor as otuc
 from matplotlib import transforms
 
 from .utils import (
@@ -114,7 +114,7 @@ def plot_regular_mesh_tally_with_geometry(
 ):
 
     if required_units is not None:
-        values = opp.process_tally(
+        values = otuc.process_tally(
             tally=tally, required_units=required_units, source_strength=source_strength
         )
     else:
@@ -163,7 +163,7 @@ def plot_regular_mesh_tally(
 ):
 
     if required_units is not None:
-        values = opp.process_tally(
+        values = otuc.process_tally(
             tally=tally, required_units=required_units, source_strength=source_strength
         )
     else:
@@ -207,7 +207,7 @@ def plot_regular_mesh_dose_tally(
 ):
 
     if required_units is not None:
-        values = opp.process_dose_tally(
+        values = otuc.process_dose_tally(
             tally=tally, required_units=required_units, source_strength=source_strength
         )
     else:
