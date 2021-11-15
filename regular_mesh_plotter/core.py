@@ -3,7 +3,7 @@ from typing import List, Optional
 import dagmc_geometry_slice_plotter as dgsp
 import matplotlib.pyplot as plt
 import numpy as np
-import openmc_tally_unit_convertor as otuc
+import openmc_tally_unit_converter as otuc
 from matplotlib import transforms
 
 from .utils import (
