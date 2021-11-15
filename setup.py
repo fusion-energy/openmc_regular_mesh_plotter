@@ -40,6 +40,6 @@ setuptools.setup(
         "scipy",
         "pandas",
         "dagmc_geometry_slice_plotter",
-        "openmc_tally_unit_converter"
+        "openmc_tally_unit_converter",
     ],
 )
