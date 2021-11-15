@@ -20,6 +20,7 @@ def plot_regular_mesh_values(
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
+    title=None,
     base_plt=None,
     extent=None,
     x_label="X [cm]",
@@ -48,6 +49,8 @@ def plot_regular_mesh_values(
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
+    if title:
+        plt.title(title)
 
     # image_map = fig.imshow(values, norm=scale, vmin=vmin)
     plt.colorbar(image_map, label=label)
@@ -63,6 +66,7 @@ def plot_regular_mesh_values_with_geometry(
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
+    title=None,
     extent=None,
     x_label="X [cm]",
     y_label="Y [cm]",
@@ -85,6 +89,7 @@ def plot_regular_mesh_values_with_geometry(
         scale=scale,  # LogNorm(),
         vmin=vmin,
         label=label,
+        title=title,
         base_plt=slice,
         extent=extent,
         x_label=x_label,
@@ -103,6 +108,7 @@ def plot_regular_mesh_tally_with_geometry(
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
+    title=None,
     x_label="X [cm]",
     y_label="Y [cm]",
     plane_origin: List[float] = None,
@@ -137,6 +143,7 @@ def plot_regular_mesh_tally_with_geometry(
         scale=scale,
         vmin=vmin,
         label=label,
+        title=title,
         base_plt=base_plt,
         extent=extent,
         x_label=x_label,
@@ -153,6 +160,7 @@ def plot_regular_mesh_tally(
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
+    title=None,
     base_plt=None,
     x_label="X [cm]",
     y_label="Y [cm]",
@@ -181,6 +189,7 @@ def plot_regular_mesh_tally(
         scale=scale,
         vmin=vmin,
         label=label,
+        title=title,
         base_plt=base_plt,
         extent=extent,
         x_label=x_label,
@@ -197,6 +206,7 @@ def plot_regular_mesh_dose_tally(
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
+    title=None,
     base_plt=None,
     x_label="X [cm]",
     y_label="Y [cm]",
@@ -225,6 +235,7 @@ def plot_regular_mesh_dose_tally(
         scale=scale,
         vmin=vmin,
         label=label,
+        title=title,
         base_plt=base_plt,
         extent=extent,
         x_label=x_label,
@@ -242,6 +253,7 @@ def plot_regular_mesh_dose_tally_with_geometry(
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
+    title=None,
     x_label="X [cm]",
     y_label="Y [cm]",
     plane_origin: List[float] = None,
@@ -266,6 +278,7 @@ def plot_regular_mesh_dose_tally_with_geometry(
         scale=scale,  # LogNorm(),
         vmin=vmin,
         label=label,
+        title=title,
         base_plt=slice,
         x_label=x_label,
         y_label=y_label,
