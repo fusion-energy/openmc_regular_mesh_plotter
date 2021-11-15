@@ -13,12 +13,12 @@ my_plot = rmp.plot_regular_mesh_dose_tally(
     filename="plot_regular_mesh_dose_tally.png",  # the filename of the picture file saved
     scale=None,  # LogNorm(),
     vmin=None,
-    label="",
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot=0,
-    required_units="picosievert cm **2 / simulated_particle",
+    required_units="picosievert / simulated_particle",
     source_strength=None,
+    label='Effective dose [picosievert / simulated_particle]'
 )
 
 # displays the plot
