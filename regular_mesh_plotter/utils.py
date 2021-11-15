@@ -4,6 +4,7 @@ from typing import List, Optional, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import openmc
+import pandas as pd
 
 
 def reshape_values_to_mesh_shape(tally, values):
