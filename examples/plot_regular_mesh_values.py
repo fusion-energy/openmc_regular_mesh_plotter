@@ -76,7 +76,11 @@ plot = rmp.plot_regular_mesh_values(
     label="legend label",
     x_label="X [cm]",
     y_label="Y [cm]",
-    contours=[2e8, 2e9, 2e10,]
+    contours=[
+        2e8,
+        2e9,
+        2e10,
+    ],
 )
 
 # plot.show()

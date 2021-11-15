@@ -52,11 +52,10 @@ def plot_regular_mesh_values(
     plt.ylabel(y_label)
     if title:
         plt.title(title)
-    
-    if contours:
-        cs = plt.contour(values, contours, colors='red', extent=extent)
-        plt.clabel(cs, inline=1, fmt=ticker.LogFormatterMathtext())
 
+    if contours:
+        cs = plt.contour(values, contours, colors="red", extent=extent)
+        plt.clabel(cs, inline=1, fmt=ticker.LogFormatterMathtext())
 
     # image_map = fig.imshow(values, norm=scale, vmin=vmin)
     plt.colorbar(image_map, label=label)
