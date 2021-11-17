@@ -211,7 +211,7 @@ def plot_regular_mesh_dose_tally(
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot: float = 0,
-    required_units="picosievert cm **2 / simulated_particle",
+    required_units="picosievert / source_particle",
     source_strength: float = None,
     std_dev_or_tally_value: str = "tally_value",
 ):
@@ -260,7 +260,7 @@ def plot_regular_mesh_dose_tally_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
-    required_units="picosievert cm **2 / simulated_particle",
+    required_units="picosievert / source_particle",
     source_strength: float = None,
     std_dev_or_tally_value: str = "tally_value",
 ):

@@ -38,6 +38,7 @@ and other mesh tally results.
 
 Example 1 shows a Numpy array plotted
 ```python
+from regular_mesh_plotter import plot_regular_mesh_values
 plot_regular_mesh_values(
     values: np.ndarray,
     filename: Optional[str] = None,
@@ -153,7 +154,7 @@ plot_regular_mesh_dose_tally_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
-    required_units="picosievert cm **2 / simulated_particle",
+    required_units="picosievert / source_particle",
     source_strength: float = None,
     std_dev_or_tally_value: str = "tally_value",
 ):
