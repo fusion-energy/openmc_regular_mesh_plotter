@@ -132,6 +132,8 @@ def plot_regular_mesh_tally_with_geometry(
         )
     else:
         values = get_values_from_tally(tally)
+        if source_strength is not None:
+            values = tuple(val*source_strength for val in values)
 
     value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
 
