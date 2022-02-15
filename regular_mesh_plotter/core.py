@@ -42,10 +42,17 @@ def plot_regular_mesh_values(
         rot = transforms.Affine2D().rotate_deg_around(x_center, y_center, rotate_plot)
 
         image_map = plt.imshow(
-            values, norm=scale, vmin=vmin, extent=extent, transform=rot + base
+            values,
+            norm=scale,
+            vmin=vmin,
+            extent=extent,
+            transform=rot + base,
+            origin="lower",
         )
     else:
-        image_map = plt.imshow(values, norm=scale, vmin=vmin, extent=extent)
+        image_map = plt.imshow(
+            values, norm=scale, vmin=vmin, extent=extent, origin="lower"
+        )
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
