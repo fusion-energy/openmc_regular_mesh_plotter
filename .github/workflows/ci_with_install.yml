@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       # image: openmc/openmc:latest-dagmc is missing the dagmc universe
-      image: openmc/openmc:develop-dagmc
+      image: openmc/openmc:v0.12.2-dagmc
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
