@@ -20,15 +20,19 @@ jobs:
   testing:
     runs-on: ubuntu-latest
     container:
-      # image: openmc/openmc:latest-dagmc is missing the dagmc universe
-      image: openmc/openmc:develop-dagmc
+      image: continuumio/miniconda3:4.10.3
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: install dependancies
+        run: |
+          conda install -c conda-forge openmc
+
       - name: install package
         run: |
           python setup.py install
+          python -c "import regular_mesh_plotter"
 
       - name: install packages for tests
         run: |

@@ -1,5 +1,4 @@
 # This minimal example makes a 3D volume and exports the shape to a stp file
-# A surrounding volume called a graveyard is needed for neutronics simulations
 
 import openmc
 import openmc_dagmc_wrapper as odw
