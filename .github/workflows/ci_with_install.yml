@@ -20,7 +20,8 @@ jobs:
   testing:
     runs-on: ubuntu-latest
     container:
-      image: continuumio/miniconda3:4.10.3
+      # image: continuumio/miniconda3:4.10.3
+      image: continuumio/miniconda3_4.9.2_endfb-7.1_nndc_tendl_2019
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
