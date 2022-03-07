@@ -14,8 +14,7 @@
 pip install regular_mesh_plotter
 ```
 
-Mesh results in the form of Numpy arrays or OpenMC.tally objects can be plotted
-with a single API call.
+Mesh results in the form of at OpenMC.tally objects can be plotted with a single API call.
 
 A Matplotlib.pyplot object is returned by all functions so one can make changes
 to the legend, axis, colour map etc. However some key options are accessible
@@ -35,82 +34,41 @@ There are additional options that allow
 The resulting plots can be used to show dose maps, activation, reaction rate
 and other mesh tally results.
 
+The examples below require a mesh tally that can be read in with OpenMC in the following way.
 
-Example 1 shows a Numpy array plotted
 ```python
-from regular_mesh_plotter import plot_regular_mesh_values
-plot_regular_mesh_values(
-    values: np.ndarray,
-    filename: Optional[str] = None,
-    scale=None,  # LogNorm(),
-    vmin=None,
-    label="",
-    base_plt=None,
-    extent=None,
-    x_label="X [cm]",
-    y_label="Y [cm]",
-    rotate_plot: float = 0,
-)
+import openmc
+
+# loads in the statepoint file containing tallies
+statepoint = openmc.StatePoint(filepath="statepoint.2.h5")
+
+# gets one tally from the available tallies
+my_tally = statepoint.get_tally(name="neutron_effective_dose_on_2D_mesh_xy")
 ```
 
-Example 2 shows a Numpy array plotted with an underlying DAGMC geometry
+Example 1 shows a OpenMC tally plotted
 ```python
-plot_regular_mesh_values_with_geometry(
-    values: np.ndarray,
-    dagmc_file_or_trimesh_object,
-    filename: Optional[str] = None,
-    scale=None,  # LogNorm(),
-    vmin=None,
-    label="",
-    extent=None,
-    x_label="X [cm]",
-    y_label="Y [cm]",
-    plane_origin: List[float] = None,
-    plane_normal: List[float] = [0, 0, 1],
-    rotate_mesh: float = 0,
-    rotate_geometry: float = 0,
-)
-```
 
-Example 3 shows a OpenMC tally plotted
-```python
-plot_regular_mesh_tally(
-    tally,
-    dagmc_file_or_trimesh_object,
+import regular_mesh_plotter as rmp
+
+my_plot = rmp.plot_regular_mesh_tally(
+    tally=my_tally,
     std_dev_or_tally_value="tally_value",
-    filename: Optional[str] = None,
-    scale=None,  # LogNorm(),
-    vmin=None,
-    label="",
     x_label="X [cm]",
     y_label="Y [cm]",
-    plane_origin: List[float] = None,
-    plane_normal: List[float] = [0, 0, 1],
-    rotate_mesh: float = 0,
-    rotate_geometry: float = 0,
-    required_units=None,
-    source_strength: float = None,
 )
+
+my_plot.save_fig('openmc_mesh_tally_plot.png')
 ```
 
 Example 4 shows a OpenMC tally plotted with an underlying DAGMC geometry
 ```python
 plot_regular_mesh_tally_with_geometry(
-    tally,
-    dagmc_file_or_trimesh_object,
+    tally=my_tally,
+    dagmc_file_or_trimesh_object='dagmc.h5m',
     std_dev_or_tally_value="tally_value",
-    filename: Optional[str] = None,
-    scale=None,  # LogNorm(),
-    vmin=None,
-    label="",
     x_label="X [cm]",
     y_label="Y [cm]",
-    plane_origin: List[float] = None,
-    plane_normal: List[float] = [0, 0, 1],
-    rotate_mesh: float = 0,
-    rotate_geometry: float = 0,
-    required_units=None,
-    source_strength: float = None,
 )
 ```
 

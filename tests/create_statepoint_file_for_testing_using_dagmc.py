@@ -1,5 +1,4 @@
 # This minimal example makes a 3D volume and exports the shape to a stp file
-# A surrounding volume called a graveyard is needed for neutronics simulations
 
 import openmc
 import openmc_dagmc_wrapper as odw
@@ -12,7 +11,7 @@ my_shape = paramak.ExtrudeStraightShape(
     distance=180,
 )
 
-my_shape.export_stl("example.stl")
+my_shape.export_stl("tests/example.stl")
 
 # This script converts the CAD stl files generated into h5m files that can be
 # used in DAGMC enabled codes. h5m files created in this way are imprinted,
@@ -20,7 +19,7 @@ my_shape.export_stl("example.stl")
 # is the assignment of materials to the volumes present in the CAD files.
 
 stl_to_h5m(
-    files_with_tags=[("example.stl", "mat1")],
+    files_with_tags=[("tests/example.stl", "mat1")],
     h5m_filename="dagmc.h5m",
 )
 

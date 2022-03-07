@@ -66,3 +66,6 @@ manifest_processed/
 # conda buid and dist dir
 build/
 dist/
+
+# python package version number
+_version.py
