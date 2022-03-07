@@ -31,6 +31,7 @@ jobs:
 
       - name: install package
         run: |
+          pip install --upgrade pip
           pip install .
           python -c "import regular_mesh_plotter"
 
