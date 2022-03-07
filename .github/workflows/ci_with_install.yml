@@ -31,16 +31,15 @@ jobs:
 
       - name: install package
         run: |
-          python setup.py install
+          pip install .
           python -c "import regular_mesh_plotter"
 
       - name: install packages for tests
         run: |
-          pip install -r requirements-test.txt 
+          pip install .[tests]
 
       - name: Run test_utils
         run: |
-          cp tests/example.stl .
           pytest tests/ -v --cov=regular_mesh_plotter --cov-append --cov-report term --cov-report xml
 
       - name: Upload to codecov
