@@ -5,6 +5,7 @@ import openmc
 import openmc_dagmc_wrapper as odw
 import openmc_plasma_source as ops
 from stl_to_h5m import stl_to_h5m
+from dagmc_bounding_box import DagmcBoundingBox
 
 # code used to create example.stl
 # import paramak
@@ -24,6 +25,8 @@ stl_to_h5m(
     h5m_filename="dagmc.h5m",
 )
 
+my_corners = DagmcBoundingBox("dagmc.h5m").corners()
+
 # makes use of the previously created neutronics geometry (h5m file) and assigns
 # actual materials to the material tags. Sets simulation intensity and specifies
 # the neutronics results to record (know as tallies).
@@ -40,42 +43,42 @@ tally1 = odw.MeshTally2D(
     tally_type="neutron_effective_dose",
     plane="xy",
     mesh_resolution=(10, 5),
-    bounding_box="dagmc.h5m",
+    bounding_box=my_corners,
 )
 tally2 = odw.MeshTally2D(
     tally_type="neutron_effective_dose",
     plane="yz",
     mesh_resolution=(10, 5),
-    bounding_box="dagmc.h5m",
+    bounding_box=my_corners,
 )
 tally3 = odw.MeshTally2D(
     tally_type="neutron_effective_dose",
     plane="xz",
     mesh_resolution=(10, 5),
-    bounding_box="dagmc.h5m",
+    bounding_box=my_corners,
 )
 tally4 = odw.MeshTally2D(
     tally_type="neutron_effective_dose",
     plane="xy",
     mesh_resolution=(10, 10),
-    bounding_box="dagmc.h5m",
+    bounding_box=my_corners,
 )
 tally5 = odw.MeshTally2D(
     tally_type="neutron_effective_dose",
     plane="yz",
     mesh_resolution=(10, 5),
-    bounding_box="dagmc.h5m",
+    bounding_box=my_corners,
 )
 tally6 = odw.MeshTally2D(
     tally_type="neutron_effective_dose",
     plane="xz",
     mesh_resolution=(10, 5),
-    bounding_box="dagmc.h5m",
+    bounding_box=my_corners,
 )
 
 # tally2 = odw.MeshTally3D(
 #     mesh_resolution=(100, 100, 100),
-#     bounding_box="dagmc.h5m",
+#     bounding_box=my_corners,
 #     tally_type="neutron_effective_dose",
 # )
 
