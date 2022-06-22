@@ -50,15 +50,16 @@ Example 1 shows a OpenMC tally plotted
 ```python
 
 import regular_mesh_plotter as rmp
+import matplotlib.pyplot as plt
 
-my_plot = rmp.plot_regular_mesh_tally(
+rmp.plot_regular_mesh_tally(
     tally=my_tally,
     std_dev_or_tally_value="tally_value",
     x_label="X [cm]",
     y_label="Y [cm]",
 )
 
-my_plot.save_fig('openmc_mesh_tally_plot.png')
+plt.savefig('openmc_mesh_tally_plot.png')
 ```
 
 Example 4 shows a OpenMC tally plotted with an underlying DAGMC geometry

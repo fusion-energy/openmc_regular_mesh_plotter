@@ -12,7 +12,6 @@ rmp.plot_regular_mesh_tally(
     tally=my_tally,
     filename="neutron_effective_dose_on_2D_mesh_xy.png",
     label="",
-    base_plt=None,
     x_label="X [cm]",
     y_label="Y [cm]",
     # rotate_plot: float = 0,
