@@ -70,8 +70,6 @@ values = np.array(
 rmp.plot_regular_mesh_values(
     values=values,
     filename="plot_regular_mesh_values.png",
-    scale=None,  # LogNorm(),
-    vmin=None,
     label="legend label",
     x_label="X [cm]",
     y_label="Y [cm]",
