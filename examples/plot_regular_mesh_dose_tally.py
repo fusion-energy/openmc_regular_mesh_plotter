@@ -11,8 +11,6 @@ my_tally = statepoint.get_tally(name="neutron_effective_dose_on_2D_mesh_xy")
 my_plot = rmp.plot_regular_mesh_dose_tally(
     tally=my_tally,  # the openmc tally object to plot, must be a 2d mesh tally
     filename="plot_regular_mesh_dose_tally.png",  # the filename of the picture file saved
-    scale=None,  # LogNorm(),
-    vmin=None,
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot=0,

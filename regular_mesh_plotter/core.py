@@ -17,8 +17,6 @@ from .utils import (
 def plot_regular_mesh_values(
     values: np.ndarray,
     filename: Optional[str] = None,
-    scale=None,  # LogNorm(),
-    vmin=None,
     label="",
     title=None,
     base_plt=None,
@@ -26,6 +24,7 @@ def plot_regular_mesh_values(
     x_label="X [cm]",
     y_label="Y [cm]",
     rotate_plot: float = 0,
+    **kwargs
 ):
 
     if base_plt:
@@ -42,17 +41,10 @@ def plot_regular_mesh_values(
         rot = transforms.Affine2D().rotate_deg_around(x_center, y_center, rotate_plot)
 
         image_map = plt.imshow(
-            values,
-            norm=scale,
-            vmin=vmin,
-            extent=extent,
-            transform=rot + base,
-            origin="lower",
+            values, extent=extent, transform=rot + base, origin="lower", **kwargs
         )
     else:
-        image_map = plt.imshow(
-            values, norm=scale, vmin=vmin, extent=extent, origin="lower"
-        )
+        image_map = plt.imshow(values, extent=extent, origin="lower", **kwargs)
 
     plt.xlabel(x_label)
     plt.ylabel(y_label)
@@ -70,8 +62,6 @@ def plot_regular_mesh_values_with_geometry(
     values: np.ndarray,
     dagmc_file_or_trimesh_object,
     filename: Optional[str] = None,
-    scale=None,  # LogNorm(),
-    vmin=None,
     label="",
     title=None,
     extent=None,
@@ -81,6 +71,7 @@ def plot_regular_mesh_values_with_geometry(
     plane_normal: List[float] = [0, 0, 1],
     rotate_mesh: float = 0,
     rotate_geometry: float = 0,
+    **kwargs
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
@@ -93,8 +84,6 @@ def plot_regular_mesh_values_with_geometry(
     both = plot_regular_mesh_values(
         values=values,
         filename=filename,
-        scale=scale,  # LogNorm(),
-        vmin=vmin,
         label=label,
         title=title,
         base_plt=slice,
@@ -102,6 +91,7 @@ def plot_regular_mesh_values_with_geometry(
         x_label=x_label,
         y_label=y_label,
         rotate_plot=rotate_mesh,
+        **kwargs
     )
 
     return both
@@ -112,8 +102,6 @@ def plot_regular_mesh_tally_with_geometry(
     dagmc_file_or_trimesh_object,
     std_dev_or_tally_value="tally_value",
     filename: Optional[str] = None,
-    scale=None,  # LogNorm(),
-    vmin=None,
     label="",
     title=None,
     x_label="X [cm]",
@@ -124,6 +112,7 @@ def plot_regular_mesh_tally_with_geometry(
     rotate_geometry: float = 0,
     required_units=None,
     source_strength: float = None,
+    **kwargs
 ):
 
     if required_units is not None:
@@ -147,8 +136,6 @@ def plot_regular_mesh_tally_with_geometry(
     plot = plot_regular_mesh_values(
         values=value,
         filename=filename,
-        scale=scale,
-        vmin=vmin,
         label=label,
         title=title,
         base_plt=base_plt,
@@ -156,6 +143,7 @@ def plot_regular_mesh_tally_with_geometry(
         x_label=x_label,
         y_label=y_label,
         rotate_plot=rotate_mesh,
+        **kwargs
     )
 
     return plot
@@ -164,8 +152,6 @@ def plot_regular_mesh_tally_with_geometry(
 def plot_regular_mesh_tally(
     tally,
     filename: Optional[str] = None,
-    scale=None,  # LogNorm(),
-    vmin=None,
     label="",
     title=None,
     base_plt=None,
@@ -175,6 +161,7 @@ def plot_regular_mesh_tally(
     required_units: str = None,
     source_strength: float = None,
     std_dev_or_tally_value="tally_value",
+    **kwargs
 ):
 
     if required_units is not None:
@@ -193,8 +180,6 @@ def plot_regular_mesh_tally(
     plot = plot_regular_mesh_values(
         values=value,
         filename=filename,
-        scale=scale,
-        vmin=vmin,
         label=label,
         title=title,
         base_plt=base_plt,
@@ -202,6 +187,7 @@ def plot_regular_mesh_tally(
         x_label=x_label,
         y_label=y_label,
         rotate_plot=rotate_plot,
+        **kwargs
     )
 
     return plot
@@ -210,8 +196,6 @@ def plot_regular_mesh_tally(
 def plot_regular_mesh_dose_tally(
     tally,
     filename: Optional[str] = None,
-    scale=None,  # LogNorm(),
-    vmin=None,
     label="",
     title=None,
     base_plt=None,
@@ -221,6 +205,7 @@ def plot_regular_mesh_dose_tally(
     required_units="picosievert / source_particle",
     source_strength: float = None,
     std_dev_or_tally_value: str = "tally_value",
+    **kwargs
 ):
 
     if required_units is not None:
@@ -239,8 +224,6 @@ def plot_regular_mesh_dose_tally(
     plot = plot_regular_mesh_values(
         values=value,
         filename=filename,
-        scale=scale,
-        vmin=vmin,
         label=label,
         title=title,
         base_plt=base_plt,
@@ -248,6 +231,7 @@ def plot_regular_mesh_dose_tally(
         x_label=x_label,
         y_label=y_label,
         rotate_plot=rotate_plot,
+        **kwargs
     )
 
     return plot
@@ -257,8 +241,6 @@ def plot_regular_mesh_dose_tally_with_geometry(
     tally,
     dagmc_file_or_trimesh_object,
     filename: Optional[str] = None,
-    scale=None,  # LogNorm(),
-    vmin=None,
     label="",
     title=None,
     x_label="X [cm]",
@@ -270,6 +252,7 @@ def plot_regular_mesh_dose_tally_with_geometry(
     required_units="picosievert / source_particle",
     source_strength: float = None,
     std_dev_or_tally_value: str = "tally_value",
+    **kwargs
 ):
 
     slice = dgsp.plot_slice_of_dagmc_geometry(
@@ -282,8 +265,6 @@ def plot_regular_mesh_dose_tally_with_geometry(
     both = plot_regular_mesh_dose_tally(
         tally=tally,
         filename=filename,
-        scale=scale,  # LogNorm(),
-        vmin=vmin,
         label=label,
         title=title,
         base_plt=slice,
@@ -293,6 +274,7 @@ def plot_regular_mesh_dose_tally_with_geometry(
         required_units=required_units,
         source_strength=source_strength,
         std_dev_or_tally_value=std_dev_or_tally_value,
+        **kwargs
     )
 
     return both
