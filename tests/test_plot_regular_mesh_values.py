@@ -2,7 +2,6 @@ import os
 import unittest
 from pathlib import Path
 
-import matplotlib
 import numpy as np
 from regular_mesh_plotter import plot_regular_mesh_values
 
@@ -77,9 +76,7 @@ class TestPlotRegularMeshValues(unittest.TestCase):
 
     def test_plot_regular_mesh_values(self):
 
-        test_plot = plot_regular_mesh_values(values=self.values)
-
-        assert isinstance(test_plot, type(matplotlib.pyplot))
+        plot_regular_mesh_values(values=self.values)
 
     def test_plot_regular_mesh_values_with_output(self):
 
