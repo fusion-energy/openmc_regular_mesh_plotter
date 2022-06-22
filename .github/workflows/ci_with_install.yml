@@ -28,7 +28,8 @@ jobs:
 
       - name: install dependancies
         run: |
-          conda install -c conda-forge openmc
+          conda install -c conda-forge mamba
+          mamba install -c conda-forge openmc
 
       - name: install package
         run: |
