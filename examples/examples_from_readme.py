@@ -2,7 +2,7 @@
 
 from dagmc_geometry_slice_plotter import plot_slice_of_dagmc_geometry
 from stl_to_h5m import stl_to_h5m
-
+import matplotlib.pyplot as plt
 import paramak
 
 my_reactor = paramak.SubmersionTokamak(
@@ -45,14 +45,14 @@ stl_to_h5m(
 )
 
 
-plot = plot_slice_of_dagmc_geometry(
+plot_slice_of_dagmc_geometry(
     dagmc_file_or_trimesh_object="dagmc.h5m",
     plane_normal=[0, 0, 1],
     output_filename="my_plot1.png",
 )
 
 
-plot = plot_slice_of_dagmc_geometry(
+plot_slice_of_dagmc_geometry(
     dagmc_file_or_trimesh_object="dagmc.h5m",
     plane_origin=[0, 0, 300],
     plane_normal=[0, 0, 1],
@@ -60,14 +60,14 @@ plot = plot_slice_of_dagmc_geometry(
 )
 
 
-plot = plot_slice_of_dagmc_geometry(
+plot_slice_of_dagmc_geometry(
     dagmc_file_or_trimesh_object="dagmc.h5m",
     plane_normal=[0, 1, 0],
     rotate_plot=45,
     output_filename="my_plot3.png",
 )
 
-plot.savefig("big.png", dpi=600)
+plt.savefig("big.png", dpi=600)
 
 plot_slice_of_dagmc_geometry(
     dagmc_file_or_trimesh_object="dagmc.h5m",

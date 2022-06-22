@@ -1,6 +1,8 @@
 import regular_mesh_plotter as rmp
 import openmc
 
+import matplotlib.pyplot as plt
+
 # loads in the statepoint file containing tallies
 statepoint = openmc.StatePoint(filepath="statepoint.2.h5")
 
@@ -8,7 +10,7 @@ statepoint = openmc.StatePoint(filepath="statepoint.2.h5")
 my_tally = statepoint.get_tally(name="neutron_effective_dose_on_2D_mesh_xy")
 
 # creates a plot of the mesh
-my_plot = rmp.plot_regular_mesh_tally_with_geometry(
+rmp.plot_regular_mesh_tally_with_geometry(
     tally=my_tally,
     dagmc_file_or_trimesh_object="dagmc.h5m",
     std_dev_or_tally_value="tally_value",
@@ -26,4 +28,4 @@ my_plot = rmp.plot_regular_mesh_tally_with_geometry(
     source_strength=None,
 )
 
-my_plot.show()
+plt.show()
