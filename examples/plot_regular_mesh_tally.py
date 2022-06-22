@@ -14,7 +14,6 @@ rmp.plot_regular_mesh_tally(
     scale=None,  # LogNorm(),
     vmin=None,
     label="",
-    base_plt=None,
     x_label="X [cm]",
     y_label="Y [cm]",
     # rotate_plot: float = 0,
