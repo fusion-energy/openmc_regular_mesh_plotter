@@ -71,8 +71,6 @@ rmp.plot_regular_mesh_values_with_geometry(
     values=values,
     dagmc_file_or_trimesh_object="example.stl",
     filename="plot_regular_mesh_values_with_geometry.png",
-    scale=None,  # LogNorm(),
-    vmin=None,
     label="legend label",
     x_label="X [cm]",
     y_label="Y [cm]",
