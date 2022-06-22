@@ -88,3 +88,12 @@ class TestPlotRegularMeshValues(unittest.TestCase):
         plot_regular_mesh_values(values=self.values, filename="test.png")
 
         assert Path("test.png").is_file()
+
+    def test_plot_regular_mesh_values_with_custom_colorbar(self):
+        """Checks that other parameters can be used such as cmap"""
+
+        os.system("rm test.png")
+
+        plot_regular_mesh_values(values=self.values, filename="test.png", cmap="jet")
+
+        assert Path("test.png").is_file()
