@@ -1,10 +1,53 @@
 [build-system]
-requires = [
-    "setuptools >= 45",
-    "wheel",
-    "setuptools_scm[toml] >= 6.2",
-]
+requires = ["setuptools >= 65.4.0", "setuptools_scm[toml]>=7.0.5"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "regular_mesh_plotter"
+authors = [
+  { name="Jonathan Shimwell", email="mail@jshimwell.com" },
+]
+license = {file = "LICENSE.txt"}
+description = "A Python package for creating publication quality plots of regular mesh tallies with the underlying geometry"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["regular", "mesh", "openmc", "tally", "plot", "slice"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.21.1",
+    "matplotlib>=3.4.2",
+    "trimesh",
+    "shapely",
+    "scipy",
+    "pandas",
+    "dagmc_geometry_slice_plotter",
+    "openmc_tally_unit_converter",
+    "setuptools_scm",
+]
+dynamic = ["version"]
+
+
 [tool.setuptools_scm]
-write_to = "regular_mesh_plotter/_version.py"
+write_to = "src/regular_mesh_plotter/_version.py"
+
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+    "dagmc_h5m_file_inspector",
+    "pytest-cov>=2.12.1",
+    "openmc-dagmc-wrapper",
+    "openmc_plasma_source",
+    "regular_mesh_plotter",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/fusion-energy/regular_mesh_plotter"
+"Bug Tracker" = "https://github.com/fusion-energy/regular_mesh_plotter/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
