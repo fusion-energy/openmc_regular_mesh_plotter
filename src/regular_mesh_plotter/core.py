@@ -1,254 +1,170 @@
-from typing import List, Optional
-
-import dagmc_geometry_slice_plotter as dgsp
-import matplotlib.pyplot as plt
 import numpy as np
-import openmc_tally_unit_converter as otuc
-from matplotlib import transforms
+import typing
+import openmc
 
-from .utils import (
-    get_std_dev_or_value_from_tally,
-    get_tally_extent,
-    get_values_from_tally,
-    reshape_values_to_mesh_shape,
-)
+class RegularMesh(openmc.RegularMesh):
+
+    def slice_of_data(
+        self,
+        dataset: np.ndarray,
+        slice_index: int = 0,
+        view_direction: str = 'z',
+        volume_normalization: bool = True
+    ):
+        """Obtains the dataset values on an axis aligned 2D slice through the
+        mesh. Useful for producing plots of slice data
+
+        Parameters
+        ----------
+        datasets : numpy.ndarray
+            1-D array of data values. Will be reshaped to fill the mesh and
+            should therefore have the same number of entries to fill the mesh
+        slice_index : int
+            The index of the mesh slice to extract.
+        view_direction : str
+            The axis to view the slice from. Supports negative and positive axis
+            values. Acceptable values are 'x', 'y', 'z', '-x', '-y', '-z'.
+        volume_normalization : bool, optional
+            Whether or not to normalize the data by the volume of the mesh
+            elements.
+
+        Returns
+        -------
+        np.array()
+            the 2D array of dataset values
+        """
+
+        if volume_normalization:
+            dataset = dataset.flatten() / self.volumes.flatten()
+
+        reshaped_ds = dataset.reshape(self.dimension, order="F")
 
 
-def plot_regular_mesh_values(
-    values: np.ndarray,
-    filename: Optional[str] = None,
-    label="",
-    title=None,
-    extent=None,
-    x_label="X [cm]",
-    y_label="Y [cm]",
-    rotate_plot: float = 0,
-    **kwargs
-):
+        if view_direction == "x":
+            # vertical axis is z, horizontal axis is -y
+            transposed_ds = reshaped_ds.transpose(0, 1, 2)[slice_index]
+            rotated_ds = np.rot90(transposed_ds, 1)
+            aligned_ds = np.fliplr(rotated_ds)
+        elif view_direction == "-x":
+            # vertical axis is z, horizontal axis is y
+            transposed_ds = reshaped_ds.transpose(0, 1, 2)[slice_index]
+            aligned_ds = np.rot90(transposed_ds, 1)
+        elif view_direction == "y":
+            # vertical axis is z, horizontal axis is x
+            transposed_ds = reshaped_ds.transpose(1, 2, 0)[slice_index]
+            aligned_ds = np.flipud(transposed_ds)
+        elif view_direction == "-y":
+            # vertical axis is z, horizontal axis is -x
+            transposed_ds = reshaped_ds.transpose(1, 2, 0)[slice_index]
+            aligned_ds = np.flipud(transposed_ds)
+            aligned_ds = np.fliplr(aligned_ds)
+        elif view_direction == "z":
+            # vertical axis is y, horizontal axis is -x
+            transposed_ds = reshaped_ds.transpose(2, 0, 1)[slice_index]
+            aligned_ds = np.rot90(transposed_ds, 1)
+            aligned_ds = np.fliplr(aligned_ds)
+        elif view_direction == "-z":
+            # vertical axis is y, horizontal axis is x
+            transposed_ds = reshaped_ds.transpose(2, 0, 1)[slice_index]
+            aligned_ds = np.rot90(transposed_ds, 1)
+        else:
+            msg = 'view_direction is not one of the acceptable options {supported_view_dirs}'
+            raise ValueError(msg)
 
-    if rotate_plot != 0:
-        x_center = sum(extent[:2]) / 2
-        y_center = sum(extent[2:]) / 2
-        base = plt.gca().transData
-        rot = transforms.Affine2D().rotate_deg_around(x_center, y_center, rotate_plot)
+        return aligned_ds
 
-        image_map = plt.imshow(
-            values, extent=extent, transform=rot + base, origin="lower", **kwargs
+
+    def plot_slice(
+        self,
+        dataset: np.ndarray,
+        slice_index: typing.Optional[int] = None,
+        view_direction: str = 'z',
+        axes: typing.Optional['matplotlib.Axes'] = None,
+        volume_normalization: bool = True,
+        **kwargs
+    ):
+        """Create a slice plot of the dataset on the RegularMesh.
+
+        Parameters
+        ----------
+        datasets : numpy.ndarray
+            1-D array of data values. Will be reshaped to fill the mesh and
+            should therefore have the same number of entries to fill the mesh
+        slice_index : int
+            The index of the mesh slice to extract. If not set then the index
+            that slices through the middle of the mesh will be used
+        view_direction : str
+            The axis to view the slice from. Supports negative and positive axis
+            values. Acceptable values are 'x', 'y', 'z', '-x', '-y', '-z'.
+        axes : matplotlib.Axes, optional
+            Axes to draw to
+        volume_normalization : bool, optional
+            Whether or not to normalize the data by the volume of the mesh
+            elements.
+        **kwargs
+            Keyword arguments passed to :func:`matplotlib.pyplot.imshow`
+
+        Returns
+        -------
+        matplotlib.image.AxesImage
+            Resulting image
+        """
+
+        import matplotlib.pyplot as plt
+
+        # gets the axis labels and bounding box index
+        if 'x' in view_direction:
+            x_label = 'Y [cm]'
+            y_label = 'Z [cm]'
+            bb_index = 0
+
+        if 'y' in view_direction:
+            x_label = 'X [cm]'
+            y_label = 'Z [cm]'
+            bb_index = 1
+
+        if 'z' in view_direction:
+            x_label = 'X [cm]'
+            y_label = 'Y [cm]'
+            bb_index = 2
+
+        # selecting mid index on the mesh for the slice
+        if slice_index is None:
+            slice_index = int(self.dimension[bb_index]/2)
+
+        # slice_of_data also checks the view_direction is acceptable
+        image_slice = self.slice_of_data(
+            dataset=dataset,
+            slice_index=slice_index,
+            view_direction=view_direction,
+            volume_normalization=volume_normalization,
         )
-    else:
-        image_map = plt.imshow(values, extent=extent, origin="lower", **kwargs)
 
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    if title:
-        plt.title(title)
+        # gets the extent of the plot
+        x_min = self.lower_left[bb_index]
+        x_max = self.upper_right[bb_index]
+        y_min = self.lower_left[bb_index]
+        y_max = self.upper_right[bb_index]
 
-    # image_map = fig.imshow(values, norm=scale, vmin=vmin)
-    plt.colorbar(image_map, label=label)
-    if filename:  # TODO should we not let the users do that?
-        plt.savefig(filename, dpi=300)
+        if axes is None:
+            fig, axes = plt.subplots()
+            axes.set_xlabel(x_label)
+            axes.set_ylabel(y_label)
+            axes.set_title(f'View direction {view_direction}')
 
-
-def plot_regular_mesh_values_with_geometry(
-    values: np.ndarray,
-    dagmc_file_or_trimesh_object,
-    filename: Optional[str] = None,
-    label="",
-    title=None,
-    extent=None,
-    x_label="X [cm]",
-    y_label="Y [cm]",
-    plane_origin: List[float] = None,
-    plane_normal: List[float] = [0, 0, 1],
-    rotate_mesh: float = 0,
-    rotate_geometry: float = 0,
-    **kwargs
-):
-
-    slice = dgsp.plot_slice_of_dagmc_geometry(
-        dagmc_file_or_trimesh_object=dagmc_file_or_trimesh_object,
-        plane_origin=plane_origin,
-        plane_normal=plane_normal,
-        rotate_plot=rotate_geometry,
-    )
-
-    plot_regular_mesh_values(
-        values=values,
-        filename=filename,
-        label=label,
-        title=title,
-        extent=extent,
-        x_label=x_label,
-        y_label=y_label,
-        rotate_plot=rotate_mesh,
-        **kwargs
-    )
-
-
-def plot_regular_mesh_tally_with_geometry(
-    tally,
-    dagmc_file_or_trimesh_object,
-    std_dev_or_tally_value="tally_value",
-    filename: Optional[str] = None,
-    label="",
-    title=None,
-    x_label="X [cm]",
-    y_label="Y [cm]",
-    plane_origin: List[float] = None,
-    plane_normal: List[float] = [0, 0, 1],
-    rotate_mesh: float = 0,
-    rotate_geometry: float = 0,
-    required_units=None,
-    source_strength: float = None,
-    **kwargs
-):
-
-    if required_units is not None:
-        values = otuc.process_tally(
-            tally=tally, required_units=required_units, source_strength=source_strength
+        return axes.imshow(
+            X=image_slice,
+            extent=(x_min, x_max, y_min, y_max),
+            aspect='auto',
+            **kwargs
         )
-    else:
-        values = get_values_from_tally(tally)
-
-    value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
-
-    extent = get_tally_extent(tally)
-
-    dgsp.plot_slice_of_dagmc_geometry(
-        dagmc_file_or_trimesh_object=dagmc_file_or_trimesh_object,
-        plane_origin=plane_origin,
-        plane_normal=plane_normal,
-        rotate_plot=rotate_geometry,
-    )
-
-    plot_regular_mesh_values(
-        values=value,
-        filename=filename,
-        label=label,
-        title=title,
-        extent=extent,
-        x_label=x_label,
-        y_label=y_label,
-        rotate_plot=rotate_mesh,
-        **kwargs
-    )
 
 
-def plot_regular_mesh_tally(
-    tally,
-    filename: Optional[str] = None,
-    label="",
-    title=None,
-    x_label="X [cm]",
-    y_label="Y [cm]",
-    rotate_plot: float = 0,
-    required_units: str = None,
-    source_strength: float = None,
-    std_dev_or_tally_value="tally_value",
-    **kwargs
-):
-
-    if required_units is not None:
-        values = otuc.process_tally(
-            tally=tally, required_units=required_units, source_strength=source_strength
-        )
-    else:
-        values = get_values_from_tally(tally)
-
-    value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
-
-    value = reshape_values_to_mesh_shape(tally, value)
-
-    extent = get_tally_extent(tally)
-
-    plot_regular_mesh_values(
-        values=value,
-        filename=filename,
-        label=label,
-        title=title,
-        extent=extent,
-        x_label=x_label,
-        y_label=y_label,
-        rotate_plot=rotate_plot,
-        **kwargs
-    )
+# def get_cell_ids_for_regularmesh_slice(mesh, geometry):
+    # loop through the centroids of the mesh
+    # find the material at each point 
+    # build up a pixel map of material ids
 
 
-def plot_regular_mesh_dose_tally(
-    tally,
-    filename: Optional[str] = None,
-    label="",
-    title=None,
-    x_label="X [cm]",
-    y_label="Y [cm]",
-    rotate_plot: float = 0,
-    required_units="picosievert / source_particle",
-    source_strength: float = None,
-    std_dev_or_tally_value: str = "tally_value",
-    **kwargs
-):
+openmc.RegularMesh = RegularMesh
 
-    if required_units is not None:
-        values = otuc.process_dose_tally(
-            tally=tally, required_units=required_units, source_strength=source_strength
-        )
-    else:
-        values = get_values_from_tally(tally)
-
-    value = get_std_dev_or_value_from_tally(tally, values, std_dev_or_tally_value)
-
-    value = reshape_values_to_mesh_shape(tally, value)
-
-    extent = get_tally_extent(tally)
-
-    plot_regular_mesh_values(
-        values=value,
-        filename=filename,
-        label=label,
-        title=title,
-        extent=extent,
-        x_label=x_label,
-        y_label=y_label,
-        rotate_plot=rotate_plot,
-        **kwargs
-    )
-
-
-def plot_regular_mesh_dose_tally_with_geometry(
-    tally,
-    dagmc_file_or_trimesh_object,
-    filename: Optional[str] = None,
-    label="",
-    title=None,
-    x_label="X [cm]",
-    y_label="Y [cm]",
-    plane_origin: List[float] = None,
-    plane_normal: List[float] = [0, 0, 1],
-    rotate_mesh: float = 0,
-    rotate_geometry: float = 0,
-    required_units="picosievert / source_particle",
-    source_strength: float = None,
-    std_dev_or_tally_value: str = "tally_value",
-    **kwargs
-):
-
-    dgsp.plot_slice_of_dagmc_geometry(
-        dagmc_file_or_trimesh_object=dagmc_file_or_trimesh_object,
-        plane_origin=plane_origin,
-        plane_normal=plane_normal,
-        rotate_plot=rotate_geometry,
-    )
-
-    plot_regular_mesh_dose_tally(
-        tally=tally,
-        filename=filename,
-        label=label,
-        title=title,
-        x_label=x_label,
-        y_label=y_label,
-        rotate_plot=rotate_mesh,
-        required_units=required_units,
-        source_strength=source_strength,
-        std_dev_or_tally_value=std_dev_or_tally_value,
-        **kwargs
-    )
