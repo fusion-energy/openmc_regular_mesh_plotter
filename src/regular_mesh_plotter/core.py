@@ -2,14 +2,14 @@ import numpy as np
 import typing
 import openmc
 
-class RegularMesh(openmc.RegularMesh):
 
+class RegularMesh(openmc.RegularMesh):
     def slice_of_data(
         self,
         dataset: np.ndarray,
         slice_index: int = 0,
-        view_direction: str = 'z',
-        volume_normalization: bool = True
+        view_direction: str = "z",
+        volume_normalization: bool = True,
     ):
         """Obtains the dataset values on an axis aligned 2D slice through the
         mesh. Useful for producing plots of slice data
@@ -39,7 +39,6 @@ class RegularMesh(openmc.RegularMesh):
 
         reshaped_ds = dataset.reshape(self.dimension, order="F")
 
-
         if view_direction == "x":
             # vertical axis is z, horizontal axis is -y
             transposed_ds = reshaped_ds.transpose(0, 1, 2)[slice_index]
@@ -68,20 +67,19 @@ class RegularMesh(openmc.RegularMesh):
             transposed_ds = reshaped_ds.transpose(2, 0, 1)[slice_index]
             aligned_ds = np.rot90(transposed_ds, 1)
         else:
-            msg = 'view_direction is not one of the acceptable options {supported_view_dirs}'
+            msg = "view_direction is not one of the acceptable options {supported_view_dirs}"
             raise ValueError(msg)
 
         return aligned_ds
-
 
     def plot_slice(
         self,
         dataset: np.ndarray,
         slice_index: typing.Optional[int] = None,
-        view_direction: str = 'z',
-        axes: typing.Optional['matplotlib.Axes'] = None,
+        view_direction: str = "z",
+        axes: typing.Optional["matplotlib.Axes"] = None,
         volume_normalization: bool = True,
-        **kwargs
+        **kwargs,
     ):
         """Create a slice plot of the dataset on the RegularMesh.
 
@@ -113,24 +111,24 @@ class RegularMesh(openmc.RegularMesh):
         import matplotlib.pyplot as plt
 
         # gets the axis labels and bounding box index
-        if 'x' in view_direction:
-            x_label = 'Y [cm]'
-            y_label = 'Z [cm]'
+        if "x" in view_direction:
+            x_label = "Y [cm]"
+            y_label = "Z [cm]"
             bb_index = 0
 
-        if 'y' in view_direction:
-            x_label = 'X [cm]'
-            y_label = 'Z [cm]'
+        if "y" in view_direction:
+            x_label = "X [cm]"
+            y_label = "Z [cm]"
             bb_index = 1
 
-        if 'z' in view_direction:
-            x_label = 'X [cm]'
-            y_label = 'Y [cm]'
+        if "z" in view_direction:
+            x_label = "X [cm]"
+            y_label = "Y [cm]"
             bb_index = 2
 
         # selecting mid index on the mesh for the slice
         if slice_index is None:
-            slice_index = int(self.dimension[bb_index]/2)
+            slice_index = int(self.dimension[bb_index] / 2)
 
         # slice_of_data also checks the view_direction is acceptable
         image_slice = self.slice_of_data(
@@ -150,21 +148,17 @@ class RegularMesh(openmc.RegularMesh):
             fig, axes = plt.subplots()
             axes.set_xlabel(x_label)
             axes.set_ylabel(y_label)
-            axes.set_title(f'View direction {view_direction}')
+            axes.set_title(f"View direction {view_direction}")
 
         return axes.imshow(
-            X=image_slice,
-            extent=(x_min, x_max, y_min, y_max),
-            aspect='auto',
-            **kwargs
+            X=image_slice, extent=(x_min, x_max, y_min, y_max), aspect="auto", **kwargs
         )
 
 
 # def get_cell_ids_for_regularmesh_slice(mesh, geometry):
-    # loop through the centroids of the mesh
-    # find the material at each point 
-    # build up a pixel map of material ids
+# loop through the centroids of the mesh
+# find the material at each point
+# build up a pixel map of material ids
 
 
 openmc.RegularMesh = RegularMesh
-
