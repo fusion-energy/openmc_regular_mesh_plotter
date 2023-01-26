@@ -7,8 +7,8 @@ class RegularMesh(openmc.RegularMesh):
     def slice_of_data(
         self,
         dataset: np.ndarray,
-        slice_index: int = 0,
         view_direction: str = "z",
+        slice_index: typing.Optional[int] = None,
         volume_normalization: bool = True,
     ):
         """Obtains the dataset values on an axis aligned 2D slice through the
@@ -19,11 +19,11 @@ class RegularMesh(openmc.RegularMesh):
         datasets : numpy.ndarray
             1-D array of data values. Will be reshaped to fill the mesh and
             should therefore have the same number of entries to fill the mesh
-        slice_index : int
-            The index of the mesh slice to extract.
         view_direction : str
             The axis to view the slice from. Supports negative and positive axis
             values. Acceptable values are 'x', 'y', 'z', '-x', '-y', '-z'.
+        slice_index : int
+            The index of the mesh slice to extract.
         volume_normalization : bool, optional
             Whether or not to normalize the data by the volume of the mesh
             elements.
@@ -33,6 +33,11 @@ class RegularMesh(openmc.RegularMesh):
         np.array()
             the 2D array of dataset values
         """
+
+        bb_index_to_view_direction = {'x': 0, 'y': 1, 'z': 2}
+
+        if slice_index is None:
+            slice_index = int(self.dimension[bb_index_to_view_direction[view_direction]] / 2)
 
         if volume_normalization:
             dataset = dataset.flatten() / self.volumes.flatten()
@@ -67,7 +72,7 @@ class RegularMesh(openmc.RegularMesh):
             transposed_ds = reshaped_ds.transpose(2, 0, 1)[slice_index]
             aligned_ds = np.rot90(transposed_ds, 1)
         else:
-            msg = "view_direction is not one of the acceptable options {supported_view_dirs}"
+            msg = "view_direction of {view_direction} is not one of the acceptable options ({supported_view_dirs})"
             raise ValueError(msg)
 
         return aligned_ds
@@ -110,21 +115,24 @@ class RegularMesh(openmc.RegularMesh):
 
         import matplotlib.pyplot as plt
 
+        bb_index_to_view_direction = {'x': 0, 'y': 1, 'z': 2}
+        bb_index = bb_index_to_view_direction[view_direction]
+
+        if slice_index is None:
+            slice_index = int(self.dimension[bb_index] / 2)
+
         # gets the axis labels and bounding box index
         if "x" in view_direction:
             x_label = "Y [cm]"
             y_label = "Z [cm]"
-            bb_index = 0
 
         if "y" in view_direction:
             x_label = "X [cm]"
             y_label = "Z [cm]"
-            bb_index = 1
 
         if "z" in view_direction:
             x_label = "X [cm]"
             y_label = "Y [cm]"
-            bb_index = 2
 
         # selecting mid index on the mesh for the slice
         if slice_index is None:
