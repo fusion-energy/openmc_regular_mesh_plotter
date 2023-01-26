@@ -162,3 +162,4 @@ class RegularMesh(openmc.RegularMesh):
 
 
 openmc.RegularMesh = RegularMesh
+openmc.mesh.RegularMesh = RegularMesh
