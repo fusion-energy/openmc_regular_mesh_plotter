@@ -34,10 +34,12 @@ class RegularMesh(openmc.RegularMesh):
             the 2D array of dataset values
         """
 
-        bb_index_to_view_direction = {'x': 0, 'y': 1, 'z': 2}
+        bb_index_to_view_direction = {"x": 0, "y": 1, "z": 2}
 
         if slice_index is None:
-            slice_index = int(self.dimension[bb_index_to_view_direction[view_direction]] / 2)
+            slice_index = int(
+                self.dimension[bb_index_to_view_direction[view_direction]] / 2
+            )
 
         if volume_normalization:
             dataset = dataset.flatten() / self.volumes.flatten()
@@ -115,7 +117,7 @@ class RegularMesh(openmc.RegularMesh):
 
         import matplotlib.pyplot as plt
 
-        bb_index_to_view_direction = {'x': 0, 'y': 1, 'z': 2}
+        bb_index_to_view_direction = {"x": 0, "y": 1, "z": 2}
         bb_index = bb_index_to_view_direction[view_direction]
 
         if slice_index is None:
