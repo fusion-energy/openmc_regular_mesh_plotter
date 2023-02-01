@@ -3,173 +3,121 @@ import typing
 import openmc
 
 
-class RegularMesh(openmc.RegularMesh):
-    def slice_of_data(
-        self,
-        dataset: np.ndarray,
-        view_direction: str = "z",
-        slice_index: typing.Optional[int] = None,
-        volume_normalization: bool = True,
-    ):
-        """Obtains the dataset values on an axis aligned 2D slice through the
-        mesh. Useful for producing plots of slice data
+def get_mpl_plot_extent(self,  view_direction:str= 'x'):
+    """Returns the (x_min, x_max, y_min, y_max) of the bounding box. The
+    view_direction is taken into account and can be set using
+    openmc.Geometry.view_direction property is taken into account and can be
+    set to 'x', 'y' or 'z'."""
 
-        Parameters
-        ----------
-        datasets : numpy.ndarray
-            1-D array of data values. Will be reshaped to fill the mesh and
-            should therefore have the same number of entries to fill the mesh
-        view_direction : str
-            The axis to view the slice from. Supports negative and positive axis
-            values. Acceptable values are 'x', 'y', 'z', '-x', '-y', '-z'.
-        slice_index : int
-            The index of the mesh slice to extract.
-        volume_normalization : bool, optional
-            Whether or not to normalize the data by the volume of the mesh
-            elements.
+    bb = (self.lower_left, self.upper_right)
 
-        Returns
-        -------
-        np.array()
-            the 2D array of dataset values
-        """
+    x_min = self.get_side_extent("left",view_direction, bb)
+    x_max = self.get_side_extent("right",view_direction, bb)
+    y_min = self.get_side_extent("bottom",view_direction, bb)
+    y_max = self.get_side_extent("top",view_direction, bb)
 
-        bb_index_to_view_direction = {"x": 0, "y": 1, "z": 2}
+    return (x_min, x_max, y_min, y_max)
 
-        if slice_index is None:
-            slice_index = int(
-                self.dimension[bb_index_to_view_direction[view_direction]] / 2
-            )
 
-        if volume_normalization:
-            dataset = dataset.flatten() / self.volumes.flatten()
+def get_side_extent(self, side: str, view_direction:str= 'x', bb=None):
 
-        reshaped_ds = dataset.reshape(self.dimension, order="F")
+    if bb is None:
+        bb = (self.lower_left, self.upper_right)
 
-        if view_direction == "x":
-            # vertical axis is z, horizontal axis is -y
-            transposed_ds = reshaped_ds.transpose(0, 1, 2)[slice_index]
-            rotated_ds = np.rot90(transposed_ds, 1)
-            aligned_ds = np.fliplr(rotated_ds)
-        elif view_direction == "-x":
-            # vertical axis is z, horizontal axis is y
-            transposed_ds = reshaped_ds.transpose(0, 1, 2)[slice_index]
-            aligned_ds = np.rot90(transposed_ds, 1)
-        elif view_direction == "y":
-            # vertical axis is z, horizontal axis is x
-            transposed_ds = reshaped_ds.transpose(1, 2, 0)[slice_index]
-            aligned_ds = np.flipud(transposed_ds)
-        elif view_direction == "-y":
-            # vertical axis is z, horizontal axis is -x
-            transposed_ds = reshaped_ds.transpose(1, 2, 0)[slice_index]
-            aligned_ds = np.flipud(transposed_ds)
-            aligned_ds = np.fliplr(aligned_ds)
-        elif view_direction == "z":
-            # vertical axis is y, horizontal axis is -x
-            transposed_ds = reshaped_ds.transpose(2, 0, 1)[slice_index]
-            aligned_ds = np.rot90(transposed_ds, 1)
-            aligned_ds = np.fliplr(aligned_ds)
-        elif view_direction == "-z":
-            # vertical axis is y, horizontal axis is x
-            transposed_ds = reshaped_ds.transpose(2, 0, 1)[slice_index]
-            aligned_ds = np.rot90(transposed_ds, 1)
-        else:
-            msg = "view_direction of {view_direction} is not one of the acceptable options ({supported_view_dirs})"
-            raise ValueError(msg)
+    avail_extents = {}
+    avail_extents[("left", "x")] = bb[0][1]
+    avail_extents[("right", "x")] = bb[1][1]
+    avail_extents[("top", "x")] = bb[1][2]
+    avail_extents[("bottom", "x")] = bb[0][2]
+    avail_extents[("left", "y")] = bb[0][0]
+    avail_extents[("right", "y")] = bb[1][0]
+    avail_extents[("top", "y")] = bb[1][2]
+    avail_extents[("bottom", "y")] = bb[0][2]
+    avail_extents[("left", "z")] = bb[0][0]
+    avail_extents[("right", "z")] = bb[1][0]
+    avail_extents[("top", "z")] = bb[1][1]
+    avail_extents[("bottom", "z")] = bb[0][1]
+    return avail_extents[(side, view_direction)]
 
-        return aligned_ds
+def slice_of_data(
+    self,
+    dataset: np.ndarray,
+    view_direction: str = "z",
+    slice_index: typing.Optional[int] = None,
+    volume_normalization: bool = True,
+):
+    """Obtains the dataset values on an axis aligned 2D slice through the
+    mesh. Useful for producing plots of slice data
 
-    def plot_slice(
-        self,
-        dataset: np.ndarray,
-        slice_index: typing.Optional[int] = None,
-        view_direction: str = "z",
-        axes: typing.Optional["matplotlib.Axes"] = None,
-        volume_normalization: bool = True,
-        **kwargs,
-    ):
-        """Create a slice plot of the dataset on the RegularMesh.
+    Parameters
+    ----------
+    datasets : numpy.ndarray
+        1-D array of data values. Will be reshaped to fill the mesh and
+        should therefore have the same number of entries to fill the mesh
+    view_direction : str
+        The axis to view the slice from. Supports negative and positive axis
+        values. Acceptable values are 'x', 'y', 'z', '-x', '-y', '-z'.
+    slice_index : int
+        The index of the mesh slice to extract.
+    volume_normalization : bool, optional
+        Whether or not to normalize the data by the volume of the mesh
+        elements.
 
-        Parameters
-        ----------
-        datasets : numpy.ndarray
-            1-D array of data values. Will be reshaped to fill the mesh and
-            should therefore have the same number of entries to fill the mesh
-        slice_index : int
-            The index of the mesh slice to extract. If not set then the index
-            that slices through the middle of the mesh will be used
-        view_direction : str
-            The axis to view the slice from. Supports negative and positive axis
-            values. Acceptable values are 'x', 'y', 'z', '-x', '-y', '-z'.
-        axes : matplotlib.Axes, optional
-            Axes to draw to
-        volume_normalization : bool, optional
-            Whether or not to normalize the data by the volume of the mesh
-            elements.
-        **kwargs
-            Keyword arguments passed to :func:`matplotlib.pyplot.imshow`
+    Returns
+    -------
+    np.array()
+        the 2D array of dataset values
+    """
 
-        Returns
-        -------
-        matplotlib.image.AxesImage
-            Resulting image
-        """
+    bb_index_to_view_direction = {"x": 0, "y": 1, "z": 2}
 
-        import matplotlib.pyplot as plt
-
-        bb_index_to_view_direction = {"x": 0, "y": 1, "z": 2}
-        bb_index = bb_index_to_view_direction[view_direction]
-
-        if slice_index is None:
-            slice_index = int(self.dimension[bb_index] / 2)
-
-        # gets the axis labels and bounding box index
-        if "x" in view_direction:
-            x_label = "Y [cm]"
-            y_label = "Z [cm]"
-
-        if "y" in view_direction:
-            x_label = "X [cm]"
-            y_label = "Z [cm]"
-
-        if "z" in view_direction:
-            x_label = "X [cm]"
-            y_label = "Y [cm]"
-
-        # selecting mid index on the mesh for the slice
-        if slice_index is None:
-            slice_index = int(self.dimension[bb_index] / 2)
-
-        # slice_of_data also checks the view_direction is acceptable
-        image_slice = self.slice_of_data(
-            dataset=dataset,
-            slice_index=slice_index,
-            view_direction=view_direction,
-            volume_normalization=volume_normalization,
+    if slice_index is None:
+        slice_index = int(
+            self.dimension[bb_index_to_view_direction[view_direction]] / 2
         )
 
-        # gets the extent of the plot
-        x_min = self.lower_left[bb_index]
-        x_max = self.upper_right[bb_index]
-        y_min = self.lower_left[bb_index]
-        y_max = self.upper_right[bb_index]
+    if volume_normalization:
+        dataset = dataset.flatten() / self.volumes.flatten()
 
-        if axes is None:
-            fig, axes = plt.subplots()
-            axes.set_xlabel(x_label)
-            axes.set_ylabel(y_label)
-            axes.set_title(f"View direction {view_direction}")
+    reshaped_ds = dataset.reshape(self.dimension, order="F")
 
-        return axes.imshow(
-            X=image_slice, extent=(x_min, x_max, y_min, y_max), aspect="auto", **kwargs
-        )
+    if view_direction == "x":
+        # vertical axis is z, horizontal axis is -y
+        transposed_ds = reshaped_ds.transpose(0, 1, 2)[slice_index]
+        rotated_ds = np.rot90(transposed_ds, 1)
+        aligned_ds = np.fliplr(rotated_ds)
+    elif view_direction == "-x":
+        # vertical axis is z, horizontal axis is y
+        transposed_ds = reshaped_ds.transpose(0, 1, 2)[slice_index]
+        aligned_ds = np.rot90(transposed_ds, 1)
+    elif view_direction == "y":
+        # vertical axis is z, horizontal axis is x
+        transposed_ds = reshaped_ds.transpose(1, 2, 0)[slice_index]
+        aligned_ds = np.flipud(transposed_ds)
+    elif view_direction == "-y":
+        # vertical axis is z, horizontal axis is -x
+        transposed_ds = reshaped_ds.transpose(1, 2, 0)[slice_index]
+        aligned_ds = np.flipud(transposed_ds)
+        aligned_ds = np.fliplr(aligned_ds)
+    elif view_direction == "z":
+        # vertical axis is y, horizontal axis is -x
+        transposed_ds = reshaped_ds.transpose(2, 0, 1)[slice_index]
+        aligned_ds = np.rot90(transposed_ds, 1)
+        aligned_ds = np.fliplr(aligned_ds)
+    elif view_direction == "-z":
+        # vertical axis is y, horizontal axis is x
+        transposed_ds = reshaped_ds.transpose(2, 0, 1)[slice_index]
+        aligned_ds = np.rot90(transposed_ds, 1)
+    else:
+        msg = "view_direction of {view_direction} is not one of the acceptable options ({supported_view_dirs})"
+        raise ValueError(msg)
+
+    return aligned_ds
 
 
-# def get_cell_ids_for_regularmesh_slice(mesh, geometry):
-# loop through the centroids of the mesh
-# find the material at each point
-# build up a pixel map of material ids
-
-
-openmc.RegularMesh = RegularMesh
-openmc.mesh.RegularMesh = RegularMesh
+openmc.RegularMesh.slice_of_data = slice_of_data
+openmc.mesh.RegularMesh.slice_of_data = slice_of_data
+openmc.RegularMesh.get_mpl_plot_extent = get_mpl_plot_extent
+openmc.mesh.RegularMesh.get_mpl_plot_extent = get_mpl_plot_extent
+openmc.RegularMesh.get_side_extent = get_side_extent
+openmc.mesh.RegularMesh.get_side_extent = get_side_extent
