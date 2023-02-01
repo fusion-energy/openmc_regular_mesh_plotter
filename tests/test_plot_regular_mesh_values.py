@@ -8,7 +8,6 @@ from regular_mesh_plotter import plot_regular_mesh_values
 
 class TestPlotRegularMeshValues(unittest.TestCase):
     def setUp(self):
-
         self.values = np.array(
             [
                 [
@@ -75,11 +74,9 @@ class TestPlotRegularMeshValues(unittest.TestCase):
         )
 
     def test_plot_regular_mesh_values(self):
-
         plot_regular_mesh_values(values=self.values)
 
     def test_plot_regular_mesh_values_with_output(self):
-
         os.system("rm test.png")
 
         plot_regular_mesh_values(values=self.values, filename="test.png")

@@ -3,7 +3,7 @@ import typing
 import openmc
 
 
-def get_mpl_plot_extent(self,  view_direction:str= 'x'):
+def get_mpl_plot_extent(self, view_direction: str = "x"):
     """Returns the (x_min, x_max, y_min, y_max) of the bounding box. The
     view_direction is taken into account and can be set using
     openmc.Geometry.view_direction property is taken into account and can be
@@ -11,16 +11,15 @@ def get_mpl_plot_extent(self,  view_direction:str= 'x'):
 
     bb = (self.lower_left, self.upper_right)
 
-    x_min = self.get_side_extent("left",view_direction, bb)
-    x_max = self.get_side_extent("right",view_direction, bb)
-    y_min = self.get_side_extent("bottom",view_direction, bb)
-    y_max = self.get_side_extent("top",view_direction, bb)
+    x_min = self.get_side_extent("left", view_direction, bb)
+    x_max = self.get_side_extent("right", view_direction, bb)
+    y_min = self.get_side_extent("bottom", view_direction, bb)
+    y_max = self.get_side_extent("top", view_direction, bb)
 
     return (x_min, x_max, y_min, y_max)
 
 
-def get_side_extent(self, side: str, view_direction:str= 'x', bb=None):
-
+def get_side_extent(self, side: str, view_direction: str = "x", bb=None):
     if bb is None:
         bb = (self.lower_left, self.upper_right)
 
@@ -38,6 +37,7 @@ def get_side_extent(self, side: str, view_direction:str= 'x', bb=None):
     avail_extents[("top", "z")] = bb[1][1]
     avail_extents[("bottom", "z")] = bb[0][1]
     return avail_extents[(side, view_direction)]
+
 
 def slice_of_data(
     self,

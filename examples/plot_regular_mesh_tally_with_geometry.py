@@ -1,7 +1,7 @@
 import openmc
 
 import openmc_geometry_plot  # extends openmc.Geometry class with plotting functions
-import regular_mesh_plotter # extends openmc.Mesh class with plotting functions
+import regular_mesh_plotter  # extends openmc.Mesh class with plotting functions
 
 
 # MATERIALS
@@ -69,12 +69,10 @@ statepoint = openmc.StatePoint(sp_filename)
 my_mesh_tally = statepoint.get_tally(name="mesh_tally")
 
 # gets a 2d slice of data to later plot
-data_slice = mesh.slice_of_data(
-    dataset=my_mesh_tally.mean, view_direction="x"
-)
+data_slice = mesh.slice_of_data(dataset=my_mesh_tally.mean, view_direction="x")
 
 # this section adds a contour line according the the material ids
-my_geometry.view_direction="x"
+my_geometry.view_direction = "x"
 material_ids = my_geometry.get_slice_of_material_ids()
 
 
