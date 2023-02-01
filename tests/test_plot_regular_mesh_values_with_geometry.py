@@ -9,7 +9,6 @@ from regular_mesh_plotter import plot_regular_mesh_values_with_geometry
 
 class TestPlotRegularMeshValuesWithGeometry(unittest.TestCase):
     def setUp(self):
-
         self.values = np.array(
             [
                 [
@@ -76,7 +75,6 @@ class TestPlotRegularMeshValuesWithGeometry(unittest.TestCase):
         )
 
     def test_plot_regular_mesh_values_with_geometry(self):
-
         plot_regular_mesh_values_with_geometry(
             values=self.values,
             dagmc_file_or_trimesh_object="tests/example.stl",  # this could be a h5m file
