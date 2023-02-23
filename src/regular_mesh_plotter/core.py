@@ -3,7 +3,7 @@ import typing
 import openmc
 
 
-def get_all_tallies_with_regular_mesh_filters(statepoint: openmc.StatePoint):
+def get_tallies_with_regular_mesh_filters(statepoint: openmc.StatePoint):
     """scans the statepoint object to find all tallies and with regular mesh
     filters, returns a list of tally indexes"""
 
@@ -11,7 +11,7 @@ def get_all_tallies_with_regular_mesh_filters(statepoint: openmc.StatePoint):
     for tally_id, tally in statepoint.tallies.items():
         print('tally id', tally_id)
         try:
-            mf=tally.find_filter(filter_type=openmc.MeshFilter)
+            mf = tally.find_filter(filter_type=openmc.MeshFilter)
             if isinstance(mf.mesh, openmc.RegularMesh):
                 matching_tally_ids.append(tally.id)
                 print('found regmeshfilter')
@@ -21,12 +21,21 @@ def get_all_tallies_with_regular_mesh_filters(statepoint: openmc.StatePoint):
     return sorted(matching_tally_ids)
 
 
-
-def get_all_regularmesh_tallies_and_scores(statepoint: openmc.StatePoint):
+def get_regularmesh_tallies_and_scores(statepoint: openmc.StatePoint):
     """scans the statepoint object to find all tallies and scores,
     returns list of dictionaries. Each dictionary contains tally id,
     score and tally name"""
-    return
+
+    tallies_of_interest = get_tallies_with_regular_mesh_filters(statepoint)
+
+    tally_score_info = []
+    for tally_id in tallies_of_interest:
+        tally = statepoint.tallies[tally_id]
+        for score in tally.scores:
+            entry = {'id': tally.id, 'score': score, 'name': tally.name}
+            tally_score_info.append(entry)
+
+    return tally_score_info
 
 
 def get_mpl_plot_extent(self, view_direction: str = "x"):
