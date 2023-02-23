@@ -75,7 +75,6 @@ def get_side_extent(self, side: str, view_direction: str = "x", bb=None):
 
 
 def reshape_data(self, dataset, view_direction):
-
     reshaped_ds = dataset.reshape(self.dimension, order="F")
 
     if view_direction == "x":
@@ -193,6 +192,7 @@ def get_axis_labels(self, view_direction):
         xlabel = "X [cm]"
         ylabel = "Y [cm]"
     return xlabel, ylabel
+
 
 openmc.RegularMesh.reshape_data = reshape_data
 openmc.mesh.RegularMesh.reshape_data = reshape_data
