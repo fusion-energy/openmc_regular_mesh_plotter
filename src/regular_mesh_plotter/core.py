@@ -9,12 +9,12 @@ def get_tallies_with_regular_mesh_filters(statepoint: openmc.StatePoint):
 
     matching_tally_ids = []
     for tally_id, tally in statepoint.tallies.items():
-        print('tally id', tally_id)
+        print("tally id", tally_id)
         try:
             mf = tally.find_filter(filter_type=openmc.MeshFilter)
             if isinstance(mf.mesh, openmc.RegularMesh):
                 matching_tally_ids.append(tally.id)
-                print('found regmeshfilter')
+                print("found regmeshfilter")
         except ValueError:
             mf = None
 
@@ -32,7 +32,7 @@ def get_regularmesh_tallies_and_scores(statepoint: openmc.StatePoint):
     for tally_id in tallies_of_interest:
         tally = statepoint.tallies[tally_id]
         for score in tally.scores:
-            entry = {'id': tally.id, 'score': score, 'name': tally.name}
+            entry = {"id": tally.id, "score": score, "name": tally.name}
             tally_score_info.append(entry)
 
     return tally_score_info
