@@ -54,6 +54,32 @@ def get_mpl_plot_extent(self, view_direction: str = "x"):
     return (x_min, x_max, y_min, y_max)
 
 
+def get_slice_axis_value_from_index(self, slice_index: int, view_direction: str):
+    x_array = self.centroids
+
+    index_val = {"x": 0, "y": 1, "z": 2}[view_direction]
+
+    if view_direction == "x":
+        axis_values = x_array[index_val, slice_index, :, :]
+    if view_direction == "y":
+        axis_values = x_array[index_val, :, slice_index, :]
+    if view_direction == "z":
+        axis_values = x_array[index_val, :, :, slice_index]
+
+    # values should all be the same so picking the first
+    return axis_values[0][0]
+
+
+# TODO
+# def get_slice_index_from_axis_value(
+#     self,
+#     axis_value: int,
+#     view_direction: str
+# ):
+
+#     return slice_index
+
+
 def get_side_extent(self, side: str, view_direction: str = "x", bb=None):
     if bb is None:
         bb = (self.lower_left, self.upper_right)
@@ -193,6 +219,11 @@ def get_axis_labels(self, view_direction):
         ylabel = "Y [cm]"
     return xlabel, ylabel
 
+
+openmc.RegularMesh.get_slice_axis_value_from_index = get_slice_axis_value_from_index
+openmc.mesh.RegularMesh.get_slice_axis_value_from_index = (
+    get_slice_axis_value_from_index
+)
 
 openmc.RegularMesh.reshape_data = reshape_data
 openmc.mesh.RegularMesh.reshape_data = reshape_data
