@@ -81,9 +81,9 @@ plot_1 = plt.imshow(
     extent=mesh.get_mpl_plot_extent(view_direction="x"),
     interpolation=None,
     norm=LogNorm(
-            vmin=1e-12,  # trims out the lower section of the colors
-            vmax=max(data_slice.flatten()),
-        ),
+        vmin=1e-12,  # trims out the lower section of the colors
+        vmax=max(data_slice.flatten()),
+    ),
 )
 cbar = plt.colorbar(plot_1)
 cbar.set_label(f"absorption per source particle")
