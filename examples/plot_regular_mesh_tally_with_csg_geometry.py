@@ -72,7 +72,7 @@ my_mesh_tally = statepoint.get_tally(name="mesh_tally")
 data_slice = mesh.slice_of_data(dataset=my_mesh_tally.mean, view_direction="x")
 
 # this section adds a contour line according the the material ids
-material_ids = my_geometry.get_slice_of_material_ids(view_direction = "x")
+material_ids = my_geometry.get_slice_of_material_ids(view_direction="x")
 
 
 import matplotlib.pyplot as plt
@@ -81,9 +81,9 @@ import numpy as np
 
 plt.imshow(
     data_slice,
-    extent=mesh.get_mpl_plot_extent(view_direction = "x"),
+    extent=mesh.get_mpl_plot_extent(view_direction="x"),
     interpolation="none",
-    norm=LogNorm()
+    norm=LogNorm(),
 )
 
 # gets unique levels for outlines contour plot and for the color scale
@@ -95,10 +95,10 @@ plt.contour(
     colors="k",
     linestyles="solid",
     levels=levels,
-    linewidths=2.,
-    extent=my_geometry.get_mpl_plot_extent(view_direction = "x"),
+    linewidths=2.0,
+    extent=my_geometry.get_mpl_plot_extent(view_direction="x"),
 )
-xlabel, ylabel = my_geometry.get_axis_labels(view_direction = "x")
+xlabel, ylabel = my_geometry.get_axis_labels(view_direction="x")
 plt.xlabel(xlabel)
 plt.ylabel(ylabel)
 plt.show()
