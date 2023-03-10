@@ -36,4 +36,4 @@ If you want to plot the DAGMC geometry without a mesh tally then take a look at
 the [dagmc_geometry_slice_plotter](https://github.com/fusion-energy/dagmc_geometry_slice_plotter) package
 
 If you want to plot the Native CSG geometry without a mesh tally then take a look at
-the [dagmc_geometry_slice_plotter](https://github.com/fusion-energy/openmc_geometry_plot) package
+the [openmc_geometry_plot](https://github.com/fusion-energy/openmc_geometry_plot) package
