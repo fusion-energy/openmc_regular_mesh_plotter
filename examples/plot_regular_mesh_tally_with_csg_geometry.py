@@ -2,22 +2,23 @@ import openmc
 
 import openmc_geometry_plot  # extends openmc.Geometry class with plotting functions
 import regular_mesh_plotter  # extends openmc.Mesh class with plotting functions
-
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+import numpy as np
 
 # MATERIALS
 
 mat_1 = openmc.Material()
 mat_1.add_element("Li", 1)
-mat_1.set_density("g/cm3", 0.5)
+mat_1.set_density("g/cm3", 0.45)
 
 my_materials = openmc.Materials([mat_1])
-
 
 # GEOMETRY
 
 # surfaces
-inner_surface = openmc.Sphere(r=500)
-outer_surface = openmc.Sphere(r=1000, boundary_type="vacuum")
+inner_surface = openmc.Sphere(r=200)
+outer_surface = openmc.Sphere(r=400, boundary_type="vacuum")
 
 # cells
 inner_region = -inner_surface
@@ -75,16 +76,17 @@ data_slice = mesh.slice_of_data(dataset=my_mesh_tally.mean, view_direction="x")
 material_ids = my_geometry.get_slice_of_material_ids(view_direction="x")
 
 
-import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
-import numpy as np
-
-plt.imshow(
+plot_1 = plt.imshow(
     data_slice,
     extent=mesh.get_mpl_plot_extent(view_direction="x"),
-    interpolation="none",
-    norm=LogNorm(),
+    interpolation=None,
+    norm=LogNorm(
+        vmin=1e-12,  # trims out the lower section of the colors
+        vmax=max(data_slice.flatten()),
+    ),
 )
+cbar = plt.colorbar(plot_1)
+cbar.set_label(f"absorption per source particle")
 
 # gets unique levels for outlines contour plot and for the color scale
 levels = np.unique([item for sublist in material_ids for item in sublist])
@@ -101,5 +103,7 @@ plt.contour(
 xlabel, ylabel = my_geometry.get_axis_labels(view_direction="x")
 plt.xlabel(xlabel)
 plt.ylabel(ylabel)
+
+
 plt.show()
 # plt.savefig("mesh_with_geometry.png")
