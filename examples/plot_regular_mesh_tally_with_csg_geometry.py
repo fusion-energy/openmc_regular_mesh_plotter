@@ -36,7 +36,7 @@ my_geometry = openmc.Geometry([inner_cell, outer_cell])
 my_settings = openmc.Settings()
 my_settings.batches = 10
 my_settings.inactive = 0
-my_settings.particles = 500
+my_settings.particles = 5000
 my_settings.run_mode = "fixed source"
 
 # Create a DT point source
@@ -72,17 +72,18 @@ my_mesh_tally = statepoint.get_tally(name="mesh_tally")
 data_slice = mesh.slice_of_data(dataset=my_mesh_tally.mean, view_direction="x")
 
 # this section adds a contour line according the the material ids
-my_geometry.view_direction = "x"
-material_ids = my_geometry.get_slice_of_material_ids()
+material_ids = my_geometry.get_slice_of_material_ids(view_direction = "x")
 
 
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 import numpy as np
 
 plt.imshow(
     data_slice,
-    extent=mesh.get_mpl_plot_extent(),
+    extent=mesh.get_mpl_plot_extent(view_direction = "x"),
     interpolation="none",
+    norm=LogNorm()
 )
 
 # gets unique levels for outlines contour plot and for the color scale
@@ -94,8 +95,11 @@ plt.contour(
     colors="k",
     linestyles="solid",
     levels=levels,
-    linewidths=0.5,
-    extent=my_geometry.get_mpl_plot_extent(),
+    linewidths=2.,
+    extent=my_geometry.get_mpl_plot_extent(view_direction = "x"),
 )
+xlabel, ylabel = my_geometry.get_axis_labels(view_direction = "x")
+plt.xlabel(xlabel)
+plt.ylabel(ylabel)
 plt.show()
 # plt.savefig("mesh_with_geometry.png")
