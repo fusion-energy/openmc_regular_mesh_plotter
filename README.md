@@ -17,6 +17,7 @@ First you will need openmc installed, then you can install this package with pip
 ```bash
 pip install regular_mesh_plotter
 ```
+
 # Usage
 
 The package can be used from within your own python script to make plots or via a GUI that is also bundled into the package install.
@@ -28,6 +29,7 @@ See the [examples folder](https://github.com/fusion-energy/regular_mesh_plotter/
 ## Graphical User Interface (GUI) usage
 
 After installing run ```openmc_mesh_plotter``` command from the terminal and the GUI should launch in a new browser window.
+
 # Related packages
 
 [openmc_plot](https://github.com/fusion-energy/openmc_plot)A single package that includes all the various plotters.
