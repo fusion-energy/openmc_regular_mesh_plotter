@@ -1,6 +1,6 @@
 [![N|Python](https://www.python.org/static/community_logos/python-powered-w-100x40.png)](https://www.python.org)
 
-[![CI with install](https://github.com/fusion-energy/openmc_regular_mesh_plotter/actions/workflows/ci_with_install.yml/badge.svg?branch=develop)](https://github.com/fusion-energy/openmc_regular_mesh_plotter/actions/workflows/ci_with_install.yml)
+[![CI with install](https://github.com/fusion-energy/openmc_regular_mesh_plotter/actions/workflows/ci_with_install.yml/badge.svg)](https://github.com/fusion-energy/openmc_regular_mesh_plotter/actions/workflows/ci_with_install.yml)
 
 [![PyPI](https://img.shields.io/pypi/v/openmc-regular-mesh-plotter?color=brightgreen&label=pypi&logo=grebrightgreenen&logoColor=green)](https://pypi.org/project/openmc-regular-mesh-plotter/)
 
