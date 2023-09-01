@@ -80,9 +80,7 @@ plot = plot_mesh_tally(
     outline=True,  # enables an outline around the geometry
     geometry=my_geometry,
     outline_by="material",
-    colorbar_kwargs={
-        "label": "Heating MJ/cm3/s"
-    },
+    colorbar_kwargs={"label": "Heating MJ/cm3/s"},
     outline_kwargs={
         "colors": "grey",
         "linewidths": 2,

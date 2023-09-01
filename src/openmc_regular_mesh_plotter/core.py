@@ -9,10 +9,11 @@ import openmc.checkvalue as cv
 import matplotlib.pyplot as plt
 
 from packaging import version
-if version.parse(openmc.__version__) < version.parse('0.13.3'):
+
+if version.parse(openmc.__version__) < version.parse("0.13.3"):
     msg = (
-        'openmc_regular_mesh_plotter package requires OpenMC version 0.13.4 '
-        f'or newer. You currently have OpenMC version {openmc.__version__}'
+        "openmc_regular_mesh_plotter package requires OpenMC version 0.13.4 "
+        f"or newer. You currently have OpenMC version {openmc.__version__}"
     )
     raise ValueError(msg)
 
