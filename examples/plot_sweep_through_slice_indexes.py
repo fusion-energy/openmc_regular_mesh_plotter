@@ -9,18 +9,25 @@ from matplotlib import cm
 
 # MATERIALS
 
-breeder_material = openmc.Material()   # Pb84.2Li15.8
-breeder_material.add_element('Pb', 84.2, percent_type='ao')
-breeder_material.add_element('Li', 15.8, percent_type='ao', enrichment=7.0, enrichment_target='Li6', enrichment_type='ao')   # natural enrichment = 7% Li6
-breeder_material.set_density('atom/b-cm', 3.2720171e-2)   # around 11 g/cm3
+breeder_material = openmc.Material()  # Pb84.2Li15.8
+breeder_material.add_element("Pb", 84.2, percent_type="ao")
+breeder_material.add_element(
+    "Li",
+    15.8,
+    percent_type="ao",
+    enrichment=7.0,
+    enrichment_target="Li6",
+    enrichment_type="ao",
+)  # natural enrichment = 7% Li6
+breeder_material.set_density("atom/b-cm", 3.2720171e-2)  # around 11 g/cm3
 
 copper_material = openmc.Material()
-copper_material.set_density('g/cm3', 8.5)
-copper_material.add_element('Cu', 1.0)
+copper_material.set_density("g/cm3", 8.5)
+copper_material.add_element("Cu", 1.0)
 
 eurofer_material = openmc.Material()
-eurofer_material.set_density('g/cm3', 7.75)
-eurofer_material.add_element('Fe', 89.067, percent_type='wo')
+eurofer_material.set_density("g/cm3", 7.75)
+eurofer_material.add_element("Fe", 89.067, percent_type="wo")
 
 my_materials = openmc.Materials([breeder_material, eurofer_material, copper_material])
 
@@ -32,13 +39,21 @@ central_sol_surface = openmc.ZCylinder(r=100)
 central_shield_outer_surface = openmc.ZCylinder(r=110)
 vessel_inner_surface = openmc.Sphere(r=500)
 first_wall_outer_surface = openmc.Sphere(r=510)
-breeder_blanket_outer_surface = openmc.Sphere(r=610,boundary_type='vacuum')
+breeder_blanket_outer_surface = openmc.Sphere(r=610, boundary_type="vacuum")
 # regions
 central_sol_region = -central_sol_surface & -breeder_blanket_outer_surface
-central_shield_region = +central_sol_surface & -central_shield_outer_surface & -breeder_blanket_outer_surface
+central_shield_region = (
+    +central_sol_surface
+    & -central_shield_outer_surface
+    & -breeder_blanket_outer_surface
+)
 inner_vessel_region = -vessel_inner_surface & +central_shield_outer_surface
 first_wall_region = -first_wall_outer_surface & +vessel_inner_surface
-breeder_blanket_region = +first_wall_outer_surface & -breeder_blanket_outer_surface & +central_shield_outer_surface
+breeder_blanket_region = (
+    +first_wall_outer_surface
+    & -breeder_blanket_outer_surface
+    & +central_shield_outer_surface
+)
 # cells
 central_sol_cell = openmc.Cell(region=central_sol_region)
 central_shield_cell = openmc.Cell(region=central_shield_region)
@@ -51,7 +66,15 @@ first_wall_cell.fill = eurofer_material
 central_shield_cell.fill = eurofer_material
 breeder_blanket_cell.fill = breeder_material
 
-my_geometry = openmc.Geometry([central_sol_cell, central_shield_cell, inner_vessel_cell, first_wall_cell, breeder_blanket_cell])
+my_geometry = openmc.Geometry(
+    [
+        central_sol_cell,
+        central_shield_cell,
+        inner_vessel_cell,
+        first_wall_cell,
+        breeder_blanket_cell,
+    ]
+)
 
 # source
 source = openmc.IndependentSource()
@@ -63,7 +86,7 @@ source.space = openmc.stats.Point((150, 150, 0))
 my_settings = openmc.Settings()
 my_settings.output = {"tallies": False}
 my_settings.batches = 2
-my_settings.particles = 50000 # increase this to get a full image
+my_settings.particles = 50000  # increase this to get a full image
 my_settings.run_mode = "fixed source"
 my_settings.source = source
 
@@ -81,7 +104,7 @@ mesh = openmc.RegularMesh().from_domain(my_geometry, dimension=dimension)
 mesh_filter = openmc.MeshFilter(mesh)
 mesh_tally = openmc.Tally(name="mesh_tally")
 mesh_tally.filters = [mesh_filter]
-mesh_tally.scores = ["(n,Xt)"] # tritium production
+mesh_tally.scores = ["(n,Xt)"]  # tritium production
 my_tallies = openmc.Tallies([mesh_tally])
 
 model = openmc.Model(my_geometry, my_materials, my_settings, my_tallies)
@@ -97,7 +120,7 @@ for slice_index in range(0, mesh.dimension[1]):
     plot = plot_mesh_tally(
         tally=my_mesh_tally_result,
         basis="xz",
-        slice_index=slice_index, 
+        slice_index=slice_index,
         outline=True,  # enables an outline around the geometry
         geometry=my_geometry,
         outline_by="cell",
@@ -108,7 +131,7 @@ for slice_index in range(0, mesh.dimension[1]):
         norm=LogNorm(),  # log scale
         volume_normalization=True,
         colorbar=False,
-        cmap=cm.get_cmap("gnuplot")  # color map contrasts with outline color
+        cmap=cm.get_cmap("gnuplot"),  # color map contrasts with outline color
     )
 
     plot.figure.savefig(f"plot_slice_index_{slice_index}.png")

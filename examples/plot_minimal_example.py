@@ -76,12 +76,14 @@ plot = plot_mesh_tally(
     outline=True,  # enables an outline around the geometry
     geometry=my_geometry,
     outline_by="material",
-    colorbar_kwargs={"label": r"Heating $\\MJcm^{-3}s^{-1}$"},  # labels support latex formatting
+    colorbar_kwargs={
+        "label": r"Heating $\\MJcm^{-3}s^{-1}$"
+    },  # labels support latex formatting
     outline_kwargs={
         "colors": "grey",
         "linewidths": 2,
     },  # setting the outline color and thickness, otherwise this defaults to black and 1
-    pixels=6000000, # this controls the resolution of the outline
+    pixels=6000000,  # this controls the resolution of the outline
     norm=LogNorm(),  # log scale
     scaling_factor=scaling_factor,  # multiplies the tally result by scaling_factor
     volume_normalization=True,
