@@ -78,7 +78,11 @@ my_geometry = openmc.Geometry(
 )
 
 # source
-source = openmc.IndependentSource()
+# work with older versions of openmc
+try:
+    source = openmc.IndependentSource()
+except:
+    source = openmc.Source()
 source.angle = openmc.stats.Isotropic()
 source.energy = openmc.stats.Discrete([14e6], [1])
 radius = openmc.stats.Discrete([150], [1])

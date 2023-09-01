@@ -129,7 +129,11 @@ angle = openmc.stats.Isotropic()
 # all (100%) of source particles are 2.5MeV energy
 energy = openmc.stats.Discrete([2.5e6], [1.0])
 
-source = openmc.IndependentSource(space=space, angle=angle, energy=energy)
+# work with older versions of openmc
+try:
+    source = openmc.IndependentSource(space=space, angle=angle, energy=energy)
+except:
+    source = openmc.Source(space=space, angle=angle, energy=energy)
 source.particle = "neutron"
 # Instantiate a Settings object
 my_settings = openmc.Settings()
