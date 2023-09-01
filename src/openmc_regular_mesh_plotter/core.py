@@ -52,7 +52,7 @@ def plot_mesh_tally(
     value : str
         A string for the type of value to return  - 'mean' (default),
         'std_dev', 'rel_err', 'sum', or 'sum_sq' are accepted
-    outline : tuple
+    outline : True
         If set then an outline will be added to the plot. The outline can be
         by cell or by material.
     outline_by : {'cell', 'material'}
