@@ -153,7 +153,7 @@ for slice_index in range(0, mesh.dimension[1]):
 
     # adding a title to the plot
     plot.title.set_text(f"Slice {slice_index}.")
-    plot.figure.savefig(f"plot_slice_index_{str(slice_index).fill(4)}.png")
+    plot.figure.savefig(f"plot_slice_index_{str(slice_index).zfill(4)}.png")
 
 import os
 
