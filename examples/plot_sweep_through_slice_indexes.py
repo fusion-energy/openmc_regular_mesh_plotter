@@ -92,9 +92,13 @@ source.space = openmc.stats.CylindricalIndependent(
 my_settings = openmc.Settings()
 my_settings.output = {"tallies": False}
 my_settings.batches = 2
+<<<<<<< HEAD
 my_settings.particles = (
     50000  # increase this to 5000000 to make the same plot as the readme
 )
+=======
+my_settings.particles = 50000  # increase this to get a full image
+>>>>>>> 32a96703fa6ffdb1a6ccbce92e97505121ea0fe9
 my_settings.run_mode = "fixed source"
 my_settings.source = source
 
@@ -141,9 +145,15 @@ for slice_index in range(0, mesh.dimension[1]):
             "colors": "green",
             "linewidths": 2,
         },  # setting the outline color and thickness, otherwise this defaults to black and 1
+<<<<<<< HEAD
         norm=LogNorm(vmin=lower_limit, vmax=upper_limit),  # log scale
         volume_normalization=False,
         # colorbar=False, removing color bar from plot
+=======
+        norm=LogNorm(),  # log scale
+        volume_normalization=True,
+        colorbar=False,
+>>>>>>> 32a96703fa6ffdb1a6ccbce92e97505121ea0fe9
         cmap=cm.get_cmap("gnuplot"),  # color map contrasts with outline color
     )
 
