@@ -81,8 +81,8 @@ plot = plot_mesh_tally(
     geometry=my_geometry,
     outline_by="material",
     colorbar_kwargs={
-        "label": r"Heating $\\MJcm^{-3}s^{-1}$"
-    },  # labels support latex formatting
+        "label": "Heating MJ/cm3/s"
+    },
     outline_kwargs={
         "colors": "grey",
         "linewidths": 2,
