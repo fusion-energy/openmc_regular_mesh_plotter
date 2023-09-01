@@ -3,7 +3,7 @@ try:
 except (ModuleNotFoundError, ImportError):
     from importlib_metadata import version, PackageNotFoundError
 try:
-    __version__ = version("regular_mesh_plotter")
+    __version__ = version("openmc_regular_mesh_plotter")
 except PackageNotFoundError:
     from setuptools_scm import get_version
 
