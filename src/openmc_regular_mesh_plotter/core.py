@@ -8,7 +8,6 @@ import openmc
 import openmc.checkvalue as cv
 import matplotlib.pyplot as plt
 
-plt.rcParams["text.usetex"] = True
 
 _BASES = ["xy", "xz", "yz"]
 

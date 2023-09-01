@@ -6,6 +6,8 @@ import openmc
 from matplotlib.colors import LogNorm
 from openmc_regular_mesh_plotter import plot_mesh_tally
 from matplotlib import cm
+import matplotlib.pyplot as plt
+
 
 # materials
 mat_concrete = openmc.Material()
