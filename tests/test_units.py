@@ -29,7 +29,8 @@ def test_plot_mesh_tally():
     source.angle = openmc.stats.Isotropic()
     source.energy = openmc.stats.Discrete([14e6], [1])
     # puts the source in the center of the RectangularParallelepiped
-    source.space = openmc.stats.Point(cell2.bounding_box.center)
+    source.space = openmc.stats.Point([-25.  25.  25.])
+    # newer versions of openmc support cell2.bounding_box.center
 
     sett = openmc.Settings()
     sett.batches = 2

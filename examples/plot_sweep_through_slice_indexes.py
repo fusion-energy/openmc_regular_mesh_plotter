@@ -86,7 +86,7 @@ except:
 source.angle = openmc.stats.Isotropic()
 source.energy = openmc.stats.Discrete([14e6], [1])
 radius = openmc.stats.Discrete([150], [1])
-z_values = openmc.stats.Discrete([250], [1])
+z_values = openmc.stats.Discrete([300], [1])
 angle = openmc.stats.Uniform(a=0.0, b=2 * 3.14159265359)
 source.space = openmc.stats.CylindricalIndependent(
     r=radius, phi=angle, z=z_values, origin=(0.0, 0.0, 0.0)
@@ -153,7 +153,7 @@ for slice_index in range(0, mesh.dimension[1]):
 
     # adding a title to the plot
     plot.title.set_text(f"Slice {slice_index}.")
-    plot.figure.savefig(f"plot_slice_index_{slice_index}.png")
+    plot.figure.savefig(f"plot_slice_index_{str(slice_index).fill(4)}.png")
 
 import os
 
