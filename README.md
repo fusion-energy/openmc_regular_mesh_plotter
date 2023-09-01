@@ -4,6 +4,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/openmc-regular-mesh-plotter?color=brightgreen&label=pypi&logo=grebrightgreenen&logoColor=green)](https://pypi.org/project/openmc-regular-mesh-plotter/)
 
+![example regular mesh tally plot 1](https://user-images.githubusercontent.com/8583900/265024747-10e33eeb-c2af-4c96-94b4-70753ca36478.png)
 
 # A minimal Python package that plots slices of OpenMC regular mesh tallies with the model geometry.
 

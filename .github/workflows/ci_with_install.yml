@@ -6,7 +6,6 @@ name: CI with install
 on:
   pull_request:
     branches:
-      - develop
       - main
     paths-ignore:
       - 'docs/**'
@@ -48,4 +47,5 @@ jobs:
       - name: Run examples
         run: |
           cd examples
-          python plot_regular_mesh_tally_with_csg_geometry.py
+          python plot_minimal_example.py
+          python plot_with_custom_color_map.py
