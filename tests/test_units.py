@@ -21,11 +21,16 @@ def test_plot_mesh_tally():
     cell2.fill = mat1
     geom = openmc.Geometry([cell1, cell2])
 
-    source = openmc.IndependentSource()
+    # work with older versions of openmc
+    try:
+        source = openmc.IndependentSource()
+    except:
+        source = openmc.Source()
     source.angle = openmc.stats.Isotropic()
     source.energy = openmc.stats.Discrete([14e6], [1])
     # puts the source in the center of the RectangularParallelepiped
-    source.space = openmc.stats.Point(cell2.bounding_box.center)
+    source.space = openmc.stats.Point([-25.0, 25.0, 25.0])
+    # newer versions of openmc support cell2.bounding_box.center
 
     sett = openmc.Settings()
     sett.batches = 2

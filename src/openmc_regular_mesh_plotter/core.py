@@ -8,7 +8,14 @@ import openmc
 import openmc.checkvalue as cv
 import matplotlib.pyplot as plt
 
-plt.rcParams["text.usetex"] = True
+from packaging import version
+
+if version.parse(openmc.__version__) < version.parse("0.13.3"):
+    msg = (
+        "openmc_regular_mesh_plotter package requires OpenMC version 0.13.4 "
+        f"or newer. You currently have OpenMC version {openmc.__version__}"
+    )
+    raise ValueError(msg)
 
 _BASES = ["xy", "xz", "yz"]
 
@@ -52,7 +59,7 @@ def plot_mesh_tally(
     value : str
         A string for the type of value to return  - 'mean' (default),
         'std_dev', 'rel_err', 'sum', or 'sum_sq' are accepted
-    outline : tuple
+    outline : True
         If set then an outline will be added to the plot. The outline can be
         by cell or by material.
     outline_by : {'cell', 'material'}

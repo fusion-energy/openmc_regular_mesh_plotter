@@ -1,4 +1,4 @@
-# This CI will lauch a Docker image that contains all the dependencies required
+# This CI will launch a Docker image that contains all the dependencies required
 # within that image the pytest test suite is run 
 
 name: CI with install
@@ -6,7 +6,6 @@ name: CI with install
 on:
   pull_request:
     branches:
-      - develop
       - main
     paths-ignore:
       - 'docs/**'
@@ -20,22 +19,16 @@ jobs:
   testing:
     runs-on: ubuntu-latest
     container:
-      # image: continuumio/miniconda3:4.10.3
-      image: ghcr.io/openmc-data-storage/miniconda3_4.9.2_endfb-7.1_nndc_tendl_2019
+      image: openmc/openmc:develop
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: install dependancies
-        run: |
-          conda install -c conda-forge mamba
-          mamba install -c conda-forge openmc
 
       - name: install package
         run: |
           pip install --upgrade pip
           pip install .
-          python -c "import regular_mesh_plotter"
+          python -c "import openmc_regular_mesh_plotter"
 
       - name: install packages for tests
         run: |
@@ -48,4 +41,6 @@ jobs:
       - name: Run examples
         run: |
           cd examples
-          python plot_regular_mesh_tally_with_csg_geometry.py
+          python plot_minimal_example.py
+          python plot_with_custom_color_map.py
+          python plot_sweep_through_slice_indexes.py

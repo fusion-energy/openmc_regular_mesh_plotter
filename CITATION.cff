@@ -7,7 +7,7 @@ authors:
 - family-names: "Delaporte-Mathurin"
   given-names: "Rémi"
   orcid: "https://orcid.org/0000-0003-1064-8882"
-title: "A Python package for plotting regular mesh tally results from neutronics simulations."
-version: 0.1.0
-date-released: 2021-10-30
-url: "https://github.com/fusion-energy/regular_mesh_plotter"
+title: "A Python package for plotting OpenMC regular mesh tally results with underlying geometry from neutronics simulations."
+version: 1.0.0
+date-released: 2022-09-01
+url: "https://github.com/fusion-energy/openmc_regular_mesh_plotter"

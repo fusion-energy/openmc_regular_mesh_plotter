@@ -6,6 +6,8 @@ import openmc
 from matplotlib.colors import LogNorm
 from openmc_regular_mesh_plotter import plot_mesh_tally
 from matplotlib import cm
+import matplotlib.pyplot as plt
+
 
 # materials
 mat_concrete = openmc.Material()
@@ -129,13 +131,17 @@ angle = openmc.stats.Isotropic()
 # all (100%) of source particles are 2.5MeV energy
 energy = openmc.stats.Discrete([2.5e6], [1.0])
 
-source = openmc.IndependentSource(space=space, angle=angle, energy=energy)
+# work with older versions of openmc
+try:
+    source = openmc.IndependentSource(space=space, angle=angle, energy=energy)
+except:
+    source = openmc.Source(space=space, angle=angle, energy=energy)
 source.particle = "neutron"
 # Instantiate a Settings object
 my_settings = openmc.Settings()
 my_settings.output = {"tallies": False}
 my_settings.batches = 2
-my_settings.particles = 500000000  # set this to 500000000 to get a full image
+my_settings.particles = 50  # set this to 500000000 to get a full image
 my_settings.run_mode = "fixed source"
 my_settings.source = source
 
@@ -186,7 +192,7 @@ plot = plot_mesh_tally(
         "colors": "darkgrey",
         "linewidths": 2,
     },  # setting the outline color and thickness, otherwise this defaults to black and 1
-    norm=LogNorm(),  # log scale
+    norm=LogNorm(vmin=1e-2, vmax=1e8),  # log scale
     scaling_factor=1e10,  # multiplies the tally result by scaling_factor which is source strength (neutrons per second)
     volume_normalization=True,
     cmap=cmap,

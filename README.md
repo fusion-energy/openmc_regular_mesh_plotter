@@ -2,13 +2,12 @@
 
 [![CI with install](https://github.com/fusion-energy/openmc_regular_mesh_plotter/actions/workflows/ci_with_install.yml/badge.svg?branch=develop)](https://github.com/fusion-energy/openmc_regular_mesh_plotter/actions/workflows/ci_with_install.yml)
 
-[![PyPI](https://img.shields.io/pypi/v/regular-mesh-plotter?color=brightgreen&label=pypi&logo=grebrightgreenen&logoColor=green)](https://pypi.org/project/regular-mesh-plotter/)
+[![PyPI](https://img.shields.io/pypi/v/openmc-regular-mesh-plotter?color=brightgreen&label=pypi&logo=grebrightgreenen&logoColor=green)](https://pypi.org/project/openmc-regular-mesh-plotter/)
 
-[![codecov](https://codecov.io/gh/fusion-energy/openmc_regular_mesh_plotter/branch/main/graph/badge.svg)](https://codecov.io/gh/fusion-energy/openmc_regular_mesh_plotter)
 
-## A minimal Python package that extracts 2D mesh tally results for plotting convenience.
+# A minimal Python package that plots slices of OpenMC regular mesh tallies with the model geometry.
 
-This package is deployed on [xsplot.com](https://www.xsplot.com) as part of the ```openmc_plot``` suite of plotting apps
+![example regular mesh tally plot 1](https://user-images.githubusercontent.com/8583900/265032335-27463ee9-8960-4f5e-a662-dab0b6cd9fc5.png)
 
 # Local install
 
@@ -21,3 +20,7 @@ pip install openmc_regular_mesh_plotter
 # Usage
 
 See the [examples folder](https://github.com/fusion-energy/openmc_regular_mesh_plotter/tree/main/examples) for example scripts
+
+# Web App
+
+This package is deployed on [xsplot.com](https://www.xsplot.com) as part of the ```openmc_plot``` suite of plotting apps
