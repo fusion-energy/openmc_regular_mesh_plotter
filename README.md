@@ -7,7 +7,7 @@
 
 # A minimal Python package that plots slices of OpenMC regular mesh tallies with the model geometry.
 
-|<img src="https://user-images.githubusercontent.com/8583900/265032335-27463ee9-8960-4f5e-a662-dab0b6cd9fc5.png" alt="drawing" width="400"/>|<img src="https://user-images.githubusercontent.com/8583900/265032335-27463ee9-8960-4f5e-a662-dab0b6cd9fc5.png" alt="drawing" width="400"/>|
+|<img src="https://user-images.githubusercontent.com/8583900/265032335-27463ee9-8960-4f5e-a662-dab0b6cd9fc5.png" alt="drawing" width="400"/>|<img src="https://user-images.githubusercontent.com/8583900/265065370-734c66ab-b20e-40c8-b72b-88203ea4347b.gif" alt="drawing" width="400"/>|
 
 # Local install
 
