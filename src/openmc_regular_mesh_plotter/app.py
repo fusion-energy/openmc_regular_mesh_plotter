@@ -139,7 +139,6 @@ def main():
 
         xlabel, ylabel = mesh.get_axis_labels(view_direction=view_direction)
 
-
         extent = None  # not yet figured out
         theta, r, values = mesh.slice_of_data(
             dataset=score,  # ,
