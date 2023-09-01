@@ -24,16 +24,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: install dependancies
-        run: |
-          conda install -c conda-forge mamba
-          mamba install -c conda-forge openmc
-
       - name: install package
         run: |
           pip install --upgrade pip
           pip install .
-          python -c "import regular_mesh_plotter"
+          python -c "import openmc_regular_mesh_plotter"
 
       - name: install packages for tests
         run: |
