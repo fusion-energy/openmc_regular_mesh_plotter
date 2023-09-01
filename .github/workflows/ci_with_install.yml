@@ -19,7 +19,7 @@ jobs:
   testing:
     runs-on: ubuntu-latest
     container:
-      image: openmc/openmc:latest
+      image: openmc/openmc:develop
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
