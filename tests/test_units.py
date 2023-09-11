@@ -76,7 +76,7 @@ def test_plot_3d_mesh_tally(model):
         tally=tally_result,
         basis="yz",
         axis_units="m",
-        slice_index=9,  # max value of slice selected
+        # slice_index=9,  # max value of slice selected
         value="std_dev",
     )
     plot.figure.savefig("x.png")
@@ -137,7 +137,7 @@ def test_plot_2d_mesh_tally(model):
         tally=tally_result,
         basis="yz",
         axis_units="m",
-        slice_index=9,  # max value of slice selected
+        # slice_index=9,  # max value of slice selected
         value="std_dev",
     )
     plot.figure.savefig("x.png")
