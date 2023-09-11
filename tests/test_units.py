@@ -1,9 +1,10 @@
 import openmc
 from matplotlib.colors import LogNorm
 from openmc_regular_mesh_plotter import plot_mesh_tally
+import pytest
 
-
-def test_plot_mesh_tally():
+@pytest.fixture()
+def model():
     mat1 = openmc.Material()
     mat1.add_nuclide("Li6", 1, percent_type="ao")
     mats = openmc.Materials([mat1])
@@ -39,14 +40,24 @@ def test_plot_mesh_tally():
     sett.run_mode = "fixed source"
     sett.source = source
 
-    mesh = openmc.RegularMesh().from_domain(geom, dimension=[10, 20, 30])
+    model = openmc.Model(geom, mats, sett)
+
+    return model
+
+
+def test_plot_mesh_tally(model):
+
+    geometry = model.geometry
+
+    mesh = openmc.RegularMesh().from_domain(geometry, dimension=[10, 20, 30])
     mesh_filter = openmc.MeshFilter(mesh)
     mesh_tally = openmc.Tally(name="mesh-tal")
     mesh_tally.filters = [mesh_filter]
     mesh_tally.scores = ["flux"]
     tallies = openmc.Tallies([mesh_tally])
 
-    model = openmc.Model(geom, mats, sett, tallies)
+    model.tallies = tallies
+
     sp_filename = model.run()
     statepoint = openmc.StatePoint(sp_filename)
     tally_result = statepoint.get_tally(name="mesh-tal")
@@ -81,7 +92,7 @@ def test_plot_mesh_tally():
         score="flux",
         value="mean",
         outline=True,
-        geometry=geom,
+        geometry=geometry,
         outline_by="material",
         colorbar_kwargs={"label": "neutron flux"},
         norm=LogNorm(vmin=1e-6, vmax=max(tally_result.mean.flatten())),
