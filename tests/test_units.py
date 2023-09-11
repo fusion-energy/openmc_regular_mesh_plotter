@@ -3,6 +3,7 @@ from matplotlib.colors import LogNorm
 from openmc_regular_mesh_plotter import plot_mesh_tally
 import pytest
 
+
 @pytest.fixture()
 def model():
     mat1 = openmc.Material()
@@ -46,7 +47,6 @@ def model():
 
 
 def test_plot_3d_mesh_tally(model):
-
     geometry = model.geometry
 
     mesh = openmc.RegularMesh().from_domain(geometry, dimension=[10, 20, 30])
@@ -61,7 +61,6 @@ def test_plot_3d_mesh_tally(model):
     sp_filename = model.run()
     with openmc.StatePoint(sp_filename) as statepoint:
         tally_result = statepoint.get_tally(name="mesh-tal")
-
 
     plot = plot_mesh_tally(
         tally=tally_result, basis="xy", slice_index=29  # max value of slice selected
@@ -106,11 +105,9 @@ def test_plot_3d_mesh_tally(model):
 
 
 def test_plot_2d_mesh_tally(model):
-
     geometry = model.geometry
 
-    mesh = openmc.RegularMesh().from_domain(
-        geometry, dimension=[1, 20, 30])
+    mesh = openmc.RegularMesh().from_domain(geometry, dimension=[1, 20, 30])
     mesh_filter = openmc.MeshFilter(mesh)
     mesh_tally = openmc.Tally(name="mesh-tal")
     mesh_tally.filters = [mesh_filter]

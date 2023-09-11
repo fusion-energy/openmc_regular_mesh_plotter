@@ -124,7 +124,6 @@ def plot_mesh_tally(
 
     basis_to_index = {"xy": 2, "xz": 1, "yz": 0}[basis]
     if len(tally_data.shape) == 3:
-
         if slice_index is None:
             slice_index = int(tally_data.shape[basis_to_index] / 2)
 
@@ -166,7 +165,7 @@ def plot_mesh_tally(
             )
 
     else:
-        raise ValueError('mesh n_dimension')
+        raise ValueError("mesh n_dimension")
 
     if volume_normalization:
         # in a regular mesh all volumes are the same so we just divide by the first
