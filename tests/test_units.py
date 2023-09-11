@@ -126,40 +126,24 @@ def test_plot_2d_mesh_tally(model):
     plot = plot_mesh_tally(
         tally=tally_result, basis="yz", slice_index=29  # max value of slice selected
     )
-    # # axis_units defaults to cm
-    # assert plot.xaxis.get_label().get_text() == "x [cm]"
-    # assert plot.yaxis.get_label().get_text() == "y [cm]"
-    # assert plot.get_xlim() == (-100.0, 50)
-    # assert plot.get_ylim() == (-200.0, 250.0)
+    # axis_units defaults to cm
+    assert plot.xaxis.get_label().get_text() == "y [cm]"
+    assert plot.yaxis.get_label().get_text() == "z [cm]"
+    assert plot.get_xlim() == (-200.0, 250.0)
+    assert plot.get_ylim() == (-300.0, 350.0)
+    plot.figure.savefig('t.png')
 
-    # plot = plot_mesh_tally(
-    #     tally=tally_result,
-    #     basis="yz",
-    #     axis_units="m",
-    #     slice_index=9,  # max value of slice selected
-    #     value="std_dev",
-    # )
-    # plot.figure.savefig("x.png")
-    # assert plot.xaxis.get_label().get_text() == "y [m]"
-    # assert plot.yaxis.get_label().get_text() == "z [m]"
-    # assert plot.get_xlim() == (-2.0, 2.5)  # note that units are in m
-    # assert plot.get_ylim() == (-3.0, 3.5)
+    plot = plot_mesh_tally(
+        tally=tally_result,
+        basis="yz",
+        axis_units="m",
+        slice_index=9,  # max value of slice selected
+        value="std_dev",
+    )
+    plot.figure.savefig("x.png")
+    assert plot.xaxis.get_label().get_text() == "y [m]"
+    assert plot.yaxis.get_label().get_text() == "z [m]"
+    assert plot.get_xlim() == (-2.0, 2.5)  # note that units are in m
+    assert plot.get_ylim() == (-3.0, 3.5)
 
-    # plot = plot_mesh_tally(
-    #     tally=tally_result,
-    #     basis="xz",
-    #     slice_index=19,  # max value of slice selected
-    #     axis_units="mm",
-    #     score="flux",
-    #     value="mean",
-    #     outline=True,
-    #     geometry=geometry,
-    #     outline_by="material",
-    #     colorbar_kwargs={"label": "neutron flux"},
-    #     norm=LogNorm(vmin=1e-6, vmax=max(tally_result.mean.flatten())),
-    # )
-    # assert plot.xaxis.get_label().get_text() == "x [mm]"
-    # assert plot.yaxis.get_label().get_text() == "z [mm]"
-    # assert plot.get_xlim() == (-1000.0, 500)  # note that units are in mm
-    # assert plot.get_ylim() == (-3000.0, 3500.0)
-    # plot.figure.savefig("z.png")
+#todo catch errors when 2d mesh used and 1d axis selected for plotting'
