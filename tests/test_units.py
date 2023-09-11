@@ -128,7 +128,7 @@ def test_plot_2d_mesh_tally(model):
     assert plot.yaxis.get_label().get_text() == "z [cm]"
     assert plot.get_xlim() == (-200.0, 250.0)
     assert plot.get_ylim() == (-300.0, 350.0)
-    plot.figure.savefig('t.png')
+    plot.figure.savefig("t.png")
 
     plot = plot_mesh_tally(
         tally=tally_result,
@@ -143,4 +143,5 @@ def test_plot_2d_mesh_tally(model):
     assert plot.get_xlim() == (-2.0, 2.5)  # note that units are in m
     assert plot.get_ylim() == (-3.0, 3.5)
 
-#todo catch errors when 2d mesh used and 1d axis selected for plotting'
+
+# todo catch errors when 2d mesh used and 1d axis selected for plotting'

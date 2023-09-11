@@ -73,9 +73,9 @@ scaling_factor = neutrons_per_second * eV_to_joules * joules_to_mega_joules
 plot = plot_mesh_tally(
     tally=my_mesh_tally,
     outline=True,  # enables an outline around the geometry
-    geometry=my_geometry, # needed for outline
+    geometry=my_geometry,  # needed for outline
     norm=LogNorm(),  # log scale
-    colorbar=False
+    colorbar=False,
 )
 
 plot.figure.savefig("example_openmc_regular_mesh_plotter.png")
