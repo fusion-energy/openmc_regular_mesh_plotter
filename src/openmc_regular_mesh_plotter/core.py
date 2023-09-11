@@ -98,9 +98,9 @@ def plot_mesh_tally(
         raise NotImplemented(
             f"Only RegularMesh are currently supported not {type(mesh)}"
         )
-    if mesh.n_dimension != 3:
-        msg = "Your mesh has {mesh.n_dimension} dimension and currently only RegularMesh with 3 dimensions are supported"
-        raise NotImplementedError(msg)
+    # if mesh.n_dimension != 3:
+    #     msg = "Your mesh has {mesh.n_dimension} dimension and currently only RegularMesh with 3 dimensions are supported"
+    #     raise NotImplementedError(msg)
 
     # if score is not specified and tally has a single score then we know which score to use
     if score is None:
@@ -112,24 +112,47 @@ def plot_mesh_tally(
 
     tally_slice = tally.get_slice(scores=[score])
 
+    # if mesh.n_dimension == 3:
+
+    if 1 in mesh.dimension:
+        index_of_2d = mesh.dimension.index(1)
+        index_of_2d = mesh.dimension.index(1)
+
+    print('mesh.dimension',mesh.dimension)
+    print('mesh.dimension',mesh.dimension)
+    print('mesh.dimension',mesh.dimension)
+    print('index_of_2d',index_of_2d)
+    print('index_of_2d',index_of_2d)
     tally_data = tally_slice.get_reshaped_data(expand_dims=True, value=value).squeeze()
 
-    if slice_index is None:
-        basis_to_index = {"xy": 2, "xz": 1, "yz": 0}[basis]
-        slice_index = int(tally_data.shape[basis_to_index] / 2)
+    basis_to_index = {"xy": 2, "xz": 1, "yz": 0}[basis]
+    if len(tally_data.shape) == 3:
 
-    if basis == "xz":
-        slice_data = tally_data[:, slice_index, :]
-        data = np.flip(np.rot90(slice_data, -1))
-        xlabel, ylabel = f"x [{axis_units}]", f"z [{axis_units}]"
-    elif basis == "yz":
-        slice_data = tally_data[slice_index, :, :]
-        data = np.flip(np.rot90(slice_data, -1))
-        xlabel, ylabel = f"y [{axis_units}]", f"z [{axis_units}]"
-    else:  # basis == 'xy'
-        slice_data = tally_data[:, :, slice_index]
-        data = np.rot90(slice_data, -3)
-        xlabel, ylabel = f"x [{axis_units}]", f"y [{axis_units}]"
+        if slice_index is None:
+            slice_index = int(tally_data.shape[basis_to_index] / 2)
+
+        if basis == "xz":
+            slice_data = tally_data[:, slice_index, :]
+            data = np.flip(np.rot90(slice_data, -1))
+            xlabel, ylabel = f"x [{axis_units}]", f"z [{axis_units}]"
+        elif basis == "yz":
+            slice_data = tally_data[slice_index, :, :]
+            data = np.flip(np.rot90(slice_data, -1))
+            xlabel, ylabel = f"y [{axis_units}]", f"z [{axis_units}]"
+        else:  # basis == 'xy'
+            slice_data = tally_data[:, :, slice_index]
+            data = np.rot90(slice_data, -3)
+            xlabel, ylabel = f"x [{axis_units}]", f"y [{axis_units}]"
+    # elif mesh.n_dimension == 2:
+    elif len(tally_data.shape) == 2:
+        print('got here')
+        if basis == basis_to_index[index_of_2d]:
+            print('good basis selected')
+        else:
+            print('bad basis selected',)
+
+    else:
+        raise ValueError('mesh n_dimension')
 
     if volume_normalization:
         # in a regular mesh all volumes are the same so we just divide by the first
