@@ -43,7 +43,7 @@ my_settings.source = source
 my_tallies = openmc.Tallies()
 mesh = openmc.RegularMesh().from_domain(
     my_geometry,  # the corners of the mesh are being set automatically to surround the geometry
-    dimension=[40, 40, 40],
+    dimension=[1, 40, 40],
 )
 mesh_filter = openmc.MeshFilter(mesh)
 mesh_tally_1 = openmc.Tally(name="mesh_tally")
@@ -71,6 +71,7 @@ scaling_factor = neutrons_per_second * eV_to_joules * joules_to_mega_joules
 # in a regular mesh all the voxels have the same volume so the [0][0][0] just picks the first volume
 
 plot = plot_mesh_tally(
+    basis="yz",  # as the mesh dimention is [1,40,40] only the yz basis can be plotted
     tally=my_mesh_tally,
     outline=True,  # enables an outline around the geometry
     geometry=my_geometry,  # needed for outline
@@ -78,5 +79,5 @@ plot = plot_mesh_tally(
     colorbar=False,
 )
 
-plot.figure.savefig("example_openmc_regular_mesh_plotter.png")
+plot.figure.savefig("example_openmc_2d_regular_mesh_plotter.png")
 plot.title.set_text("")

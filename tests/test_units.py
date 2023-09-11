@@ -1,9 +1,11 @@
 import openmc
 from matplotlib.colors import LogNorm
 from openmc_regular_mesh_plotter import plot_mesh_tally
+import pytest
 
 
-def test_plot_mesh_tally():
+@pytest.fixture()
+def model():
     mat1 = openmc.Material()
     mat1.add_nuclide("Li6", 1, percent_type="ao")
     mats = openmc.Materials([mat1])
@@ -39,17 +41,26 @@ def test_plot_mesh_tally():
     sett.run_mode = "fixed source"
     sett.source = source
 
-    mesh = openmc.RegularMesh().from_domain(geom, dimension=[10, 20, 30])
+    model = openmc.Model(geom, mats, sett)
+
+    return model
+
+
+def test_plot_3d_mesh_tally(model):
+    geometry = model.geometry
+
+    mesh = openmc.RegularMesh().from_domain(geometry, dimension=[10, 20, 30])
     mesh_filter = openmc.MeshFilter(mesh)
     mesh_tally = openmc.Tally(name="mesh-tal")
     mesh_tally.filters = [mesh_filter]
     mesh_tally.scores = ["flux"]
     tallies = openmc.Tallies([mesh_tally])
 
-    model = openmc.Model(geom, mats, sett, tallies)
+    model.tallies = tallies
+
     sp_filename = model.run()
-    statepoint = openmc.StatePoint(sp_filename)
-    tally_result = statepoint.get_tally(name="mesh-tal")
+    with openmc.StatePoint(sp_filename) as statepoint:
+        tally_result = statepoint.get_tally(name="mesh-tal")
 
     plot = plot_mesh_tally(
         tally=tally_result, basis="xy", slice_index=29  # max value of slice selected
@@ -64,7 +75,7 @@ def test_plot_mesh_tally():
         tally=tally_result,
         basis="yz",
         axis_units="m",
-        slice_index=9,  # max value of slice selected
+        # slice_index=9,  # max value of slice selected
         value="std_dev",
     )
     plot.figure.savefig("x.png")
@@ -81,7 +92,7 @@ def test_plot_mesh_tally():
         score="flux",
         value="mean",
         outline=True,
-        geometry=geom,
+        geometry=geometry,
         outline_by="material",
         colorbar_kwargs={"label": "neutron flux"},
         norm=LogNorm(vmin=1e-6, vmax=max(tally_result.mean.flatten())),
@@ -91,3 +102,46 @@ def test_plot_mesh_tally():
     assert plot.get_xlim() == (-1000.0, 500)  # note that units are in mm
     assert plot.get_ylim() == (-3000.0, 3500.0)
     plot.figure.savefig("z.png")
+
+
+def test_plot_2d_mesh_tally(model):
+    geometry = model.geometry
+
+    mesh = openmc.RegularMesh().from_domain(geometry, dimension=[1, 20, 30])
+    mesh_filter = openmc.MeshFilter(mesh)
+    mesh_tally = openmc.Tally(name="mesh-tal")
+    mesh_tally.filters = [mesh_filter]
+    mesh_tally.scores = ["flux"]
+    tallies = openmc.Tallies([mesh_tally])
+
+    model.tallies = tallies
+
+    sp_filename = model.run()
+    with openmc.StatePoint(sp_filename) as statepoint:
+        tally_result = statepoint.get_tally(name="mesh-tal")
+
+    plot = plot_mesh_tally(
+        tally=tally_result, basis="yz", slice_index=29  # max value of slice selected
+    )
+    # axis_units defaults to cm
+    assert plot.xaxis.get_label().get_text() == "y [cm]"
+    assert plot.yaxis.get_label().get_text() == "z [cm]"
+    assert plot.get_xlim() == (-200.0, 250.0)
+    assert plot.get_ylim() == (-300.0, 350.0)
+    plot.figure.savefig("t.png")
+
+    plot = plot_mesh_tally(
+        tally=tally_result,
+        basis="yz",
+        axis_units="m",
+        # slice_index=9,  # max value of slice selected
+        value="std_dev",
+    )
+    plot.figure.savefig("x.png")
+    assert plot.xaxis.get_label().get_text() == "y [m]"
+    assert plot.yaxis.get_label().get_text() == "z [m]"
+    assert plot.get_xlim() == (-2.0, 2.5)  # note that units are in m
+    assert plot.get_ylim() == (-3.0, 3.5)
+
+
+# todo catch errors when 2d mesh used and 1d axis selected for plotting'
