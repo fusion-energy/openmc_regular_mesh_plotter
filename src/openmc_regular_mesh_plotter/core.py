@@ -142,7 +142,6 @@ def plot_mesh_tally(
     # elif mesh.n_dimension == 2:
     elif len(tally_data.shape) == 2:
         if basis_to_index == index_of_2d:
-
             slice_data = tally_data[:, :]
             if basis == "xz":
                 data = np.flip(np.rot90(slice_data, -1))
