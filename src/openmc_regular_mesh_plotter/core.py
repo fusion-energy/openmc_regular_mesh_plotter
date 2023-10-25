@@ -141,10 +141,7 @@ def plot_mesh_tally(
             xlabel, ylabel = f"x [{axis_units}]", f"y [{axis_units}]"
     # elif mesh.n_dimension == 2:
     elif len(tally_data.shape) == 2:
-        print("got here")
         if basis_to_index == index_of_2d:
-            print("good basis selected", basis)
-
             slice_data = tally_data[:, :]
             if basis == "xz":
                 data = np.flip(np.rot90(slice_data, -1))
