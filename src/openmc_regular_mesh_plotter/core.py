@@ -100,11 +100,8 @@ def plot_mesh_tally(
     mesh = tally.find_filter(filter_type=openmc.MeshFilter).mesh
     if not isinstance(mesh, openmc.RegularMesh):
         raise NotImplemented(
-            f"Only RegularMesh are currently supported not {type(mesh)}"
+            f"Only RegularMesh are supported not {type(mesh)}"
         )
-    # if mesh.n_dimension != 3:
-    #     msg = "Your mesh has {mesh.n_dimension} dimension and currently only RegularMesh with 3 dimensions are supported"
-    #     raise NotImplementedError(msg)
 
     # if score is not specified and tally has a single score then we know which score to use
     if score is None:
@@ -118,7 +115,6 @@ def plot_mesh_tally(
 
     basis_to_index = {"xy": 2, "xz": 1, "yz": 0}[basis]
 
-    print('mesh.dimension', mesh.dimension)
     if 1 in mesh.dimension:
         index_of_2d = mesh.dimension.index(1)
         axis_of_2d = {0: "x", 1: "y", 2: "z"}[index_of_2d]
@@ -151,7 +147,6 @@ def plot_mesh_tally(
             xlabel, ylabel = f"y [{axis_units}]", f"z [{axis_units}]"
         else:  # basis == 'xy'
             slice_data = tally_data[:, :, slice_index]
-            print('shape slice_data', slice_data.shape)
             data = np.rot90(slice_data, -3)
             xlabel, ylabel = f"x [{axis_units}]", f"y [{axis_units}]"
 
