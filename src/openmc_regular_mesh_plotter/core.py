@@ -21,10 +21,12 @@ _BASES = ["xy", "xz", "yz"]
 
 _default_outline_kwargs = {"colors": "black", "linestyles": "solid", "linewidths": 1}
 
+
 def _squeeze_end_of_array(array, dims_required=3):
     while len(array.shape) > dims_required:
-        array = np.squeeze(array, axis=len(array.shape)-1)
+        array = np.squeeze(array, axis=len(array.shape) - 1)
     return array
+
 
 def plot_mesh_tally(
     tally: "openmc.Tally",
@@ -118,7 +120,9 @@ def plot_mesh_tally(
     if 1 in mesh.dimension:
         index_of_2d = mesh.dimension.index(1)
         axis_of_2d = {0: "x", 1: "y", 2: "z"}[index_of_2d]
-        if axis_of_2d in basis:  # checks if the axis is being plotted, e.g is 'x' in 'xy'
+        if (
+            axis_of_2d in basis
+        ):  # checks if the axis is being plotted, e.g is 'x' in 'xy'
             raise ValueError(
                 "The selected tally has a mesh that has 1 dimension in the "
                 f"{axis_of_2d} axis, minimum of 2 needed to plot with a basis "
@@ -127,7 +131,9 @@ def plot_mesh_tally(
 
     # TODO check if 1 appears twice or three times, raise value error if so
 
-    tally_data = tally_slice.get_reshaped_data(expand_dims=True, value=value)#.squeeze()
+    tally_data = tally_slice.get_reshaped_data(
+        expand_dims=True, value=value
+    )  # .squeeze()
 
     tally_data = _squeeze_end_of_array(tally_data, dims_required=3)
 
@@ -151,7 +157,9 @@ def plot_mesh_tally(
             xlabel, ylabel = f"x [{axis_units}]", f"y [{axis_units}]"
 
     else:
-        raise ValueError(f"mesh n_dimension is not 3 or 2 but is {mesh.n_dimension} which is not supported")
+        raise ValueError(
+            f"mesh n_dimension is not 3 or 2 but is {mesh.n_dimension} which is not supported"
+        )
 
     if volume_normalization:
         # in a regular mesh all volumes are the same so we just divide by the first
