@@ -7,6 +7,10 @@ import numpy as np
 from matplotlib.colors import LogNorm
 from openmc_regular_mesh_plotter import plot_mesh_tally
 from matplotlib import cm
+import matplotlib
+
+# sets the font for the axis
+matplotlib.rc("font", **{"family": "normal", "size": 22})
 
 # MATERIALS
 
