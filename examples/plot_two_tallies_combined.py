@@ -38,18 +38,18 @@ except:
     # work with older versions of openmc
     source_n = openmc.Source()
     source_p = openmc.Source()
-    
+
 source_n.space = openmc.stats.Point((200, 0, 0))
 source_n.angle = openmc.stats.Isotropic()
 source_n.energy = openmc.stats.Discrete([0.1e6], [1])
 source_n.strength = 1
-source_n.particle='neutron'
+source_n.particle = "neutron"
 
 source_p.space = openmc.stats.Point((-200, 0, 0))
 source_p.angle = openmc.stats.Isotropic()
 source_p.energy = openmc.stats.Discrete([10e6], [1])
 source_p.strength = 10
-source_p.particle='photon'
+source_p.particle = "photon"
 
 my_settings.source = [source_n, source_p]
 
@@ -101,7 +101,7 @@ plot = plot_mesh_tally(
 )
 plot.title.set_text("neutron heating")
 plot.figure.savefig("neutron_regular_mesh_plotter.png")
-print('written file neutron_regular_mesh_plotter.png')
+print("written file neutron_regular_mesh_plotter.png")
 
 plot = plot_mesh_tally(
     tally=[my_mesh_tally_photon],
@@ -110,7 +110,7 @@ plot = plot_mesh_tally(
 )
 plot.title.set_text("photon heating")
 plot.figure.savefig("photon_regular_mesh_plotter.png")
-print('written file photon_regular_mesh_plotter.png')
+print("written file photon_regular_mesh_plotter.png")
 
 plot = plot_mesh_tally(
     tally=[my_mesh_tally_photon, my_mesh_tally_neutron],
@@ -119,4 +119,4 @@ plot = plot_mesh_tally(
 )
 plot.title.set_text("photon and neutron heating")
 plot.figure.savefig("photon_and_neutron_regular_mesh_plotter.png")
-print('written file photon_and_neutron_regular_mesh_plotter.png')
+print("written file photon_and_neutron_regular_mesh_plotter.png")
