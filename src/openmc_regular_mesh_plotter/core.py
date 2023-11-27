@@ -108,12 +108,16 @@ def plot_mesh_tally(
             # TODO check the tallies use the same mesh
             mesh_ids.append(mesh.id)
         if not all(i == mesh_ids[0] for i in mesh_ids):
-            raise ValueError(f'mesh ids {mesh_ids} are different, please use same mesh when combining tallies')
+            raise ValueError(
+                f"mesh ids {mesh_ids} are different, please use same mesh when combining tallies"
+            )
     else:
         mesh = tally.find_filter(filter_type=openmc.MeshFilter).mesh
 
     if isinstance(mesh, openmc.CylindricalMesh):
-        raise NotImplemented(f"Only RegularMesh are supported, not {type(mesh)}, try the openmc_cylindrical_mesh_plotter package available at https://github.com/fusion-energy/openmc_cylindrical_mesh_plotter/")
+        raise NotImplemented(
+            f"Only RegularMesh are supported, not {type(mesh)}, try the openmc_cylindrical_mesh_plotter package available at https://github.com/fusion-energy/openmc_cylindrical_mesh_plotter/"
+        )
     if not isinstance(mesh, openmc.RegularMesh):
         raise NotImplemented(f"Only RegularMesh are supported, not {type(mesh)}")
 
@@ -145,7 +149,6 @@ def plot_mesh_tally(
     default_imshow_kwargs.update(kwargs)
 
     if isinstance(tally, typing.Sequence):
-        
         for counter, one_tally in enumerate(tally):
             new_data = _get_tally_data(
                 scaling_factor,
@@ -155,11 +158,11 @@ def plot_mesh_tally(
                 value,
                 volume_normalization,
                 score,
-                slice_index
+                slice_index,
             )
             if counter == 0:
                 data = np.zeros(shape=new_data.shape)
-            data=data+new_data
+            data = data + new_data
     else:  # single tally
         data = _get_tally_data(
             scaling_factor,
@@ -169,7 +172,7 @@ def plot_mesh_tally(
             value,
             volume_normalization,
             score,
-            slice_index
+            slice_index,
         )
 
     im = axes.imshow(data, extent=(x_min, x_max, y_min, y_max), **default_imshow_kwargs)
@@ -295,17 +298,10 @@ def get_index_where(self, value: float, basis: str = "xy"):
 
     return slice_index
 
+
 def _get_tally_data(
-        scaling_factor,
-        mesh,
-        basis,
-        tally,
-        value,
-        volume_normalization,
-        score,
-        slice_index
+    scaling_factor, mesh, basis, tally, value, volume_normalization, score, slice_index
 ):
-        
     # if score is not specified and tally has a single score then we know which score to use
     if score is None:
         if len(tally.scores) == 1:
@@ -315,8 +311,6 @@ def _get_tally_data(
             raise ValueError(msg)
 
     tally_slice = tally.get_slice(scores=[score])
-
-    
 
     if 1 in mesh.dimension:
         index_of_2d = mesh.dimension.index(1)
@@ -340,7 +334,6 @@ def _get_tally_data(
 
     # if len(tally_data.shape) == 3:
     if mesh.n_dimension == 3:
-
         if basis == "xz":
             slice_data = tally_data[:, slice_index, :]
             data = np.flip(np.rot90(slice_data, -1))

@@ -170,7 +170,9 @@ def test_plot_two_mesh_tallies(model):
         tally_result_2 = statepoint.get_tally(name="mesh-tal-2")
 
     plot = plot_mesh_tally(
-        tally=[tally_result_1, tally_result_2], basis="yz", slice_index=0  # max value of slice selected
+        tally=[tally_result_1, tally_result_2],
+        basis="yz",
+        slice_index=0,  # max value of slice selected
     )
 
     plot = plot_mesh_tally(tally=[tally_result_1, tally_result_2], basis="yz")
@@ -193,5 +195,6 @@ def test_plot_two_mesh_tallies(model):
     assert plot.yaxis.get_label().get_text() == "z [m]"
     assert plot.get_xlim() == (-2.0, 2.5)  # note that units are in m
     assert plot.get_ylim() == (-3.0, 3.5)
+
 
 # todo catch errors when 2d mesh used and 1d axis selected for plotting'
