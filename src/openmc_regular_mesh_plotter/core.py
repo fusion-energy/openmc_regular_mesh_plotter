@@ -145,8 +145,8 @@ def plot_mesh_tally(
     default_imshow_kwargs.update(kwargs)
 
     if isinstance(tally, typing.Sequence):
-        data = np.zeros(shape=(40,40))
-        for one_tally in tally:
+        
+        for counter, one_tally in enumerate(tally):
             new_data = _get_tally_data(
                 scaling_factor,
                 mesh,
@@ -157,6 +157,8 @@ def plot_mesh_tally(
                 score,
                 slice_index
             )
+            if counter == 0:
+                data = np.zeros(shape=new_data.shape)
             data=data+new_data
     else:  # single tally
         data = _get_tally_data(

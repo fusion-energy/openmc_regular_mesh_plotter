@@ -151,12 +151,15 @@ def test_plot_two_mesh_tallies(model):
 
     mesh = openmc.RegularMesh().from_domain(geometry, dimension=[1, 20, 30])
     mesh_filter = openmc.MeshFilter(mesh)
+
     mesh_tally_1 = openmc.Tally(name="mesh-tal-1")
     mesh_tally_1.filters = [mesh_filter]
     mesh_tally_1.scores = ["flux"]
+
     mesh_tally_2 = openmc.Tally(name="mesh-tal-2")
     mesh_tally_2.filters = [mesh_filter]
     mesh_tally_2.scores = ["heating"]
+
     tallies = openmc.Tallies([mesh_tally_1, mesh_tally_2])
 
     model.tallies = tallies
@@ -179,7 +182,7 @@ def test_plot_two_mesh_tallies(model):
     plot.figure.savefig("t.png")
 
     plot = plot_mesh_tally(
-        tally=tally_result,
+        tally=[tally_result_1, tally_result_2],
         basis="yz",
         axis_units="m",
         # slice_index=9,  # max value of slice selected
