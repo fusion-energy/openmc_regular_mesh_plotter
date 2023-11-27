@@ -44,6 +44,8 @@ jobs:
       - name: Run examples
         run: |
           cd examples
+          python plot_minimal_2d_example.py
           python plot_minimal_example.py
-          python plot_with_custom_color_map.py
+          python plot_two_tallies_combined.py
           python plot_sweep_through_slice_indexes.py
+          python plot_with_custom_color_map.py

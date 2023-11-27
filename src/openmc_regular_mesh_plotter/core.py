@@ -1,7 +1,7 @@
 import math
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Optional
+import typing
 import openmc
 import numpy as np
 import openmc
@@ -29,20 +29,20 @@ def _squeeze_end_of_array(array, dims_required=3):
 
 
 def plot_mesh_tally(
-    tally: "openmc.Tally",
+    tally: typing.Union["openmc.Tally", typing.Sequence["openmc.Tally"]],
     basis: str = "xy",
-    slice_index: Optional[int] = None,
-    score: Optional[str] = None,
-    axes: Optional[str] = None,
+    slice_index: typing.Optional[int] = None,
+    score: typing.Optional[str] = None,
+    axes: typing.Optional[str] = None,
     axis_units: str = "cm",
     value: str = "mean",
     outline: bool = False,
     outline_by: str = "cell",
-    geometry: Optional["openmc.Geometry"] = None,
+    geometry: typing.Optional["openmc.Geometry"] = None,
     pixels: int = 40000,
     colorbar: bool = True,
     volume_normalization: bool = True,
-    scaling_factor: Optional[float] = None,
+    scaling_factor: typing.Optional[float] = None,
     colorbar_kwargs: dict = {},
     outline_kwargs: dict = _default_outline_kwargs,
     **kwargs,
@@ -101,72 +101,25 @@ def plot_mesh_tally(
     cv.check_type("volume_normalization", volume_normalization, bool)
     cv.check_type("outline", outline, bool)
 
-    mesh = tally.find_filter(filter_type=openmc.MeshFilter).mesh
-    if not isinstance(mesh, openmc.RegularMesh):
-        raise NotImplemented(f"Only RegularMesh are supported not {type(mesh)}")
-
-    # if score is not specified and tally has a single score then we know which score to use
-    if score is None:
-        if len(tally.scores) == 1:
-            score = tally.scores[0]
-        else:
-            msg = "score was not specified and there are multiple scores in the tally."
-            raise ValueError(msg)
-
-    tally_slice = tally.get_slice(scores=[score])
-
-    basis_to_index = {"xy": 2, "xz": 1, "yz": 0}[basis]
-
-    if 1 in mesh.dimension:
-        index_of_2d = mesh.dimension.index(1)
-        axis_of_2d = {0: "x", 1: "y", 2: "z"}[index_of_2d]
-        if (
-            axis_of_2d in basis
-        ):  # checks if the axis is being plotted, e.g is 'x' in 'xy'
+    if isinstance(tally, typing.Sequence):
+        mesh_ids = []
+        for one_tally in tally:
+            mesh = one_tally.find_filter(filter_type=openmc.MeshFilter).mesh
+            # TODO check the tallies use the same mesh
+            mesh_ids.append(mesh.id)
+        if not all(i == mesh_ids[0] for i in mesh_ids):
             raise ValueError(
-                "The selected tally has a mesh that has 1 dimension in the "
-                f"{axis_of_2d} axis, minimum of 2 needed to plot with a basis "
-                f"of {basis}."
+                f"mesh ids {mesh_ids} are different, please use same mesh when combining tallies"
             )
-
-    # TODO check if 1 appears twice or three times, raise value error if so
-
-    tally_data = tally_slice.get_reshaped_data(
-        expand_dims=True, value=value
-    )  # .squeeze()
-
-    tally_data = _squeeze_end_of_array(tally_data, dims_required=3)
-
-    # if len(tally_data.shape) == 3:
-    if mesh.n_dimension == 3:
-        if slice_index is None:
-            # finds the mid index
-            slice_index = int(tally_data.shape[basis_to_index] / 2)
-
-        if basis == "xz":
-            slice_data = tally_data[:, slice_index, :]
-            data = np.flip(np.rot90(slice_data, -1))
-            xlabel, ylabel = f"x [{axis_units}]", f"z [{axis_units}]"
-        elif basis == "yz":
-            slice_data = tally_data[slice_index, :, :]
-            data = np.flip(np.rot90(slice_data, -1))
-            xlabel, ylabel = f"y [{axis_units}]", f"z [{axis_units}]"
-        else:  # basis == 'xy'
-            slice_data = tally_data[:, :, slice_index]
-            data = np.rot90(slice_data, -3)
-            xlabel, ylabel = f"x [{axis_units}]", f"y [{axis_units}]"
-
     else:
-        raise ValueError(
-            f"mesh n_dimension is not 3 or 2 but is {mesh.n_dimension} which is not supported"
+        mesh = tally.find_filter(filter_type=openmc.MeshFilter).mesh
+
+    if isinstance(mesh, openmc.CylindricalMesh):
+        raise NotImplemented(
+            f"Only RegularMesh are supported, not {type(mesh)}, try the openmc_cylindrical_mesh_plotter package available at https://github.com/fusion-energy/openmc_cylindrical_mesh_plotter/"
         )
-
-    if volume_normalization:
-        # in a regular mesh all volumes are the same so we just divide by the first
-        data = data / mesh.volumes[0][0][0]
-
-    if scaling_factor:
-        data = data * scaling_factor
+    if not isinstance(mesh, openmc.RegularMesh):
+        raise NotImplemented(f"Only RegularMesh are supported, not {type(mesh)}")
 
     axis_scaling_factor = {"km": 0.00001, "m": 0.01, "cm": 1, "mm": 10}[axis_units]
 
@@ -174,14 +127,53 @@ def plot_mesh_tally(
         i * axis_scaling_factor for i in mesh.bounding_box.extent[basis]
     ]
 
+    if basis == "xz":
+        xlabel, ylabel = f"x [{axis_units}]", f"z [{axis_units}]"
+    elif basis == "yz":
+        xlabel, ylabel = f"y [{axis_units}]", f"z [{axis_units}]"
+    else:  # basis == 'xy'
+        xlabel, ylabel = f"x [{axis_units}]", f"y [{axis_units}]"
+
     if axes is None:
         fig, axes = plt.subplots()
         axes.set_xlabel(xlabel)
         axes.set_ylabel(ylabel)
 
+    basis_to_index = {"xy": 2, "xz": 1, "yz": 0}[basis]
+    if slice_index is None:
+        # finds the mid index
+        slice_index = int(mesh.dimension[basis_to_index] / 2)
+
     # zero values with logscale produce noise / fuzzy on the time but setting interpolation to none solves this
     default_imshow_kwargs = {"interpolation": "none"}
     default_imshow_kwargs.update(kwargs)
+
+    if isinstance(tally, typing.Sequence):
+        for counter, one_tally in enumerate(tally):
+            new_data = _get_tally_data(
+                scaling_factor,
+                mesh,
+                basis,
+                one_tally,
+                value,
+                volume_normalization,
+                score,
+                slice_index,
+            )
+            if counter == 0:
+                data = np.zeros(shape=new_data.shape)
+            data = data + new_data
+    else:  # single tally
+        data = _get_tally_data(
+            scaling_factor,
+            mesh,
+            basis,
+            tally,
+            value,
+            volume_normalization,
+            score,
+            slice_index,
+        )
 
     im = axes.imshow(data, extent=(x_min, x_max, y_min, y_max), **default_imshow_kwargs)
 
@@ -198,36 +190,28 @@ def plot_mesh_tally(
         x1, y1, z1 = mesh.upper_right
         nx, ny, nz = mesh.dimension
         center_of_mesh = mesh.bounding_box.center
+
         if basis == "xy":
             zarr = np.linspace(z0, z1, nz + 1)
-            if len(tally_data.shape) == 3:
-                center_of_mesh_slice = [
-                    center_of_mesh[0],
-                    center_of_mesh[1],
-                    (zarr[slice_index] + zarr[slice_index + 1]) / 2,
-                ]
-            else:  # 2
-                center_of_mesh_slice = mesh.bounding_box.center
+            center_of_mesh_slice = [
+                center_of_mesh[0],
+                center_of_mesh[1],
+                (zarr[slice_index] + zarr[slice_index + 1]) / 2,
+            ]
         if basis == "xz":
             yarr = np.linspace(y0, y1, ny + 1)
-            if len(tally_data.shape) == 3:
-                center_of_mesh_slice = [
-                    center_of_mesh[0],
-                    (yarr[slice_index] + yarr[slice_index + 1]) / 2,
-                    center_of_mesh[2],
-                ]
-            else:  # 2
-                center_of_mesh_slice = mesh.bounding_box.center
+            center_of_mesh_slice = [
+                center_of_mesh[0],
+                (yarr[slice_index] + yarr[slice_index + 1]) / 2,
+                center_of_mesh[2],
+            ]
         if basis == "yz":
             xarr = np.linspace(x0, x1, nx + 1)
-            if len(tally_data.shape) == 3:
-                center_of_mesh_slice = [
-                    (xarr[slice_index] + xarr[slice_index + 1]) / 2,
-                    center_of_mesh[1],
-                    center_of_mesh[2],
-                ]
-            else:  # 2
-                center_of_mesh_slice = mesh.bounding_box.center
+            center_of_mesh_slice = [
+                (xarr[slice_index] + xarr[slice_index + 1]) / 2,
+                center_of_mesh[1],
+                center_of_mesh[2],
+            ]
 
         model = openmc.Model()
         model.geometry = geometry
@@ -313,3 +297,62 @@ def get_index_where(self, value: float, basis: str = "xy"):
     slice_index = (np.abs(voxel_axis_vals - value)).argmin()
 
     return slice_index
+
+
+def _get_tally_data(
+    scaling_factor, mesh, basis, tally, value, volume_normalization, score, slice_index
+):
+    # if score is not specified and tally has a single score then we know which score to use
+    if score is None:
+        if len(tally.scores) == 1:
+            score = tally.scores[0]
+        else:
+            msg = "score was not specified and there are multiple scores in the tally."
+            raise ValueError(msg)
+
+    tally_slice = tally.get_slice(scores=[score])
+
+    if 1 in mesh.dimension:
+        index_of_2d = mesh.dimension.index(1)
+        axis_of_2d = {0: "x", 1: "y", 2: "z"}[index_of_2d]
+        if (
+            axis_of_2d in basis
+        ):  # checks if the axis is being plotted, e.g is 'x' in 'xy'
+            raise ValueError(
+                "The selected tally has a mesh that has 1 dimension in the "
+                f"{axis_of_2d} axis, minimum of 2 needed to plot with a basis "
+                f"of {basis}."
+            )
+
+    # TODO check if 1 appears twice or three times, raise value error if so
+
+    tally_data = tally_slice.get_reshaped_data(
+        expand_dims=True, value=value
+    )  # .squeeze()
+
+    tally_data = _squeeze_end_of_array(tally_data, dims_required=3)
+
+    # if len(tally_data.shape) == 3:
+    if mesh.n_dimension == 3:
+        if basis == "xz":
+            slice_data = tally_data[:, slice_index, :]
+            data = np.flip(np.rot90(slice_data, -1))
+        elif basis == "yz":
+            slice_data = tally_data[slice_index, :, :]
+            data = np.flip(np.rot90(slice_data, -1))
+        else:  # basis == 'xy'
+            slice_data = tally_data[:, :, slice_index]
+            data = np.rot90(slice_data, -3)
+
+    else:
+        raise ValueError(
+            f"mesh n_dimension is not 3 but is {mesh.n_dimension} which is not supported"
+        )
+
+    if volume_normalization:
+        # in a regular mesh all volumes are the same so we just divide by the first
+        data = data / mesh.volumes[0][0][0]
+
+    if scaling_factor:
+        data = data * scaling_factor
+    return data
