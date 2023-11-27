@@ -146,4 +146,49 @@ def test_plot_2d_mesh_tally(model):
     assert plot.get_ylim() == (-3.0, 3.5)
 
 
+def test_plot_two_mesh_tallies(model):
+    geometry = model.geometry
+
+    mesh = openmc.RegularMesh().from_domain(geometry, dimension=[1, 20, 30])
+    mesh_filter = openmc.MeshFilter(mesh)
+    mesh_tally_1 = openmc.Tally(name="mesh-tal-1")
+    mesh_tally_1.filters = [mesh_filter]
+    mesh_tally_1.scores = ["flux"]
+    mesh_tally_2 = openmc.Tally(name="mesh-tal-2")
+    mesh_tally_2.filters = [mesh_filter]
+    mesh_tally_2.scores = ["heating"]
+    tallies = openmc.Tallies([mesh_tally_1, mesh_tally_2])
+
+    model.tallies = tallies
+
+    sp_filename = model.run()
+    with openmc.StatePoint(sp_filename) as statepoint:
+        tally_result_1 = statepoint.get_tally(name="mesh-tal-1")
+        tally_result_2 = statepoint.get_tally(name="mesh-tal-2")
+
+    plot = plot_mesh_tally(
+        tally=[tally_result_1, tally_result_2], basis="yz", slice_index=0  # max value of slice selected
+    )
+
+    plot = plot_mesh_tally(tally=[tally_result_1, tally_result_2], basis="yz")
+    # axis_units defaults to cm
+    assert plot.xaxis.get_label().get_text() == "y [cm]"
+    assert plot.yaxis.get_label().get_text() == "z [cm]"
+    assert plot.get_xlim() == (-200.0, 250.0)
+    assert plot.get_ylim() == (-300.0, 350.0)
+    plot.figure.savefig("t.png")
+
+    plot = plot_mesh_tally(
+        tally=tally_result,
+        basis="yz",
+        axis_units="m",
+        # slice_index=9,  # max value of slice selected
+        value="std_dev",
+    )
+    plot.figure.savefig("x.png")
+    assert plot.xaxis.get_label().get_text() == "y [m]"
+    assert plot.yaxis.get_label().get_text() == "z [m]"
+    assert plot.get_xlim() == (-2.0, 2.5)  # note that units are in m
+    assert plot.get_ylim() == (-3.0, 3.5)
+
 # todo catch errors when 2d mesh used and 1d axis selected for plotting'
