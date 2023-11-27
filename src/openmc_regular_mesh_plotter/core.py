@@ -101,9 +101,7 @@ def plot_mesh_tally(
 
     mesh = tally.find_filter(filter_type=openmc.MeshFilter).mesh
     if not isinstance(mesh, openmc.RegularMesh):
-        raise NotImplemented(
-            f"Only RegularMesh are supported not {type(mesh)}"
-        )
+        raise NotImplemented(f"Only RegularMesh are supported not {type(mesh)}")
 
     # if score is not specified and tally has a single score then we know which score to use
     if score is None:
