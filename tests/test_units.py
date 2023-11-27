@@ -121,8 +121,10 @@ def test_plot_2d_mesh_tally(model):
         tally_result = statepoint.get_tally(name="mesh-tal")
 
     plot = plot_mesh_tally(
-        tally=tally_result, basis="yz", slice_index=29  # max value of slice selected
+        tally=tally_result, basis="yz", slice_index=0  # max value of slice selected
     )
+
+    plot = plot_mesh_tally(tally=tally_result, basis="yz")
     # axis_units defaults to cm
     assert plot.xaxis.get_label().get_text() == "y [cm]"
     assert plot.yaxis.get_label().get_text() == "z [cm]"
