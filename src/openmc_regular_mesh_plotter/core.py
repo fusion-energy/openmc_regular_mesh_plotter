@@ -85,9 +85,11 @@ def plot_mesh_tally(
     colorbar_kwargs : dict
         Keyword arguments passed to :func:`matplotlib.colorbar.Colorbar`.
     outline_kwargs : dict
-        Keyword arguments passed to :func:`matplotlib.pyplot.contour`.
+        Keyword arguments passed to :func:`matplotlib.pyplot.contour`. Defaults
+        to "colors": "black", "linestyles": "solid", "linewidths": 1
     **kwargs
-        Keyword arguments passed to :func:`matplotlib.pyplot.imshow`
+        Keyword arguments passed to :func:`matplotlib.pyplot.imshow`. Defaults
+        to {"interpolation", "none"}.
     Returns
     -------
     matplotlib.image.AxesImage
@@ -177,7 +179,11 @@ def plot_mesh_tally(
         axes.set_xlabel(xlabel)
         axes.set_ylabel(ylabel)
 
-    im = axes.imshow(data, extent=(x_min, x_max, y_min, y_max), **kwargs)
+    # zero values with logscale produce noise / fuzzy on the time but setting interpolation to none solves this
+    default_imshow_kwargs = {"interpolation": "none"}
+    default_imshow_kwargs.update(kwargs)
+
+    im = axes.imshow(data, extent=(x_min, x_max, y_min, y_max), **default_imshow_kwargs)
 
     if colorbar:
         fig.colorbar(im, **colorbar_kwargs)
