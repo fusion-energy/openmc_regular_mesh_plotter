@@ -236,6 +236,13 @@ def plot_mesh_tally(
 
     elif plotting_backend == 'matplotlib':
 
+        if basis == "xz":
+            data = np.flip(np.rot90(data, -1))
+        elif basis == "yz":
+            data = np.flip(np.rot90(data, -1))
+        else:  # basis == 'xy'
+            data = np.rot90(data, -3)
+
         im = axes.imshow(data, extent=(x_min, x_max, y_min, y_max), **default_imshow_kwargs)
 
         if colorbar:
@@ -244,6 +251,13 @@ def plot_mesh_tally(
         if outline and geometry is not None:
 
             image_value = get_outline(mesh, basis, slice_index, geometry, outline_by, pixels)
+
+            if basis == "xz":
+                image_value = np.rot90(image_value, 2)
+            elif basis == "yz":
+                image_value = np.rot90(image_value, 2)
+            else:  # basis == 'xy'
+                image_value = np.rot90(image_value, 2)
 
             # Plot image and return the axes
             axes.contour(
@@ -319,12 +333,6 @@ def get_outline(mesh, basis, slice_index, geometry, outline_by, pixels):
     rgb = (img * 256).astype(int)
     image_value = (rgb[..., 0] << 16) + (rgb[..., 1] << 8) + (rgb[..., 2])
 
-    if basis == "xz":
-        image_value = np.rot90(image_value, 2)
-    elif basis == "yz":
-        image_value = np.rot90(image_value, 2)
-    else:  # basis == 'xy'
-        image_value = np.rot90(image_value, 2)
     return image_value
 
 # TODO currently we allow slice index, but this code will be useful if want to
@@ -402,14 +410,11 @@ def _get_tally_data(
     # if len(tally_data.shape) == 3:
     if mesh.n_dimension == 3:
         if basis == "xz":
-            slice_data = tally_data[:, slice_index, :]
-            data = np.flip(np.rot90(slice_data, -1))
+            data = tally_data[:, slice_index, :]
         elif basis == "yz":
-            slice_data = tally_data[slice_index, :, :]
-            data = np.flip(np.rot90(slice_data, -1))
+            data = tally_data[slice_index, :, :]
         else:  # basis == 'xy'
-            slice_data = tally_data[:, :, slice_index]
-            data = np.rot90(slice_data, -3)
+            data = tally_data[:, :, slice_index]
 
     else:
         raise ValueError(
