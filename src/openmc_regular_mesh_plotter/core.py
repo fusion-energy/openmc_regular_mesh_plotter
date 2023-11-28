@@ -237,8 +237,7 @@ def plot_mesh_tally(
         print()
         return fig
 
-    elif plotting_backend == 'matplotlib':
-
+    elif plotting_backend == "matplotlib":
         if basis == "xz":
             data = np.flip(np.rot90(data, -1))
         elif basis == "yz":
@@ -246,7 +245,9 @@ def plot_mesh_tally(
         else:  # basis == 'xy'
             data = np.rot90(data, -3)
 
-        im = axes.imshow(data, extent=(x_min, x_max, y_min, y_max), **default_imshow_kwargs)
+        im = axes.imshow(
+            data, extent=(x_min, x_max, y_min, y_max), **default_imshow_kwargs
+        )
 
         if colorbar:
             fig.colorbar(im, **colorbar_kwargs)
