@@ -80,4 +80,4 @@ plot = plot_mesh_tally(
 
 plot.title.set_text("")
 plot.figure.savefig("example_openmc_regular_mesh_plotter.png")
-print('file created example_openmc_regular_mesh_plotter.png')
+print("file created example_openmc_regular_mesh_plotter.png")
