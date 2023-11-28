@@ -45,7 +45,7 @@ def plot_mesh_tally(
     scaling_factor: typing.Optional[float] = None,
     colorbar_kwargs: dict = {},
     outline_kwargs: dict = _default_outline_kwargs,
-    plotting_backend: str = 'matplotlib',
+    plotting_backend: str = "matplotlib",
     **kwargs,
 ) -> "matplotlib.image.AxesImage":
     """Display a slice plot of the mesh tally score.
@@ -176,10 +176,11 @@ def plot_mesh_tally(
             slice_index,
         )
 
-    if plotting_backend == 'plotly':
+    if plotting_backend == "plotly":
         import plotly.graph_objects as go
-        dx = abs(x_min - x_max)/(data.shape[0]-1)
-        dy = abs(y_min - y_max)/(data.shape[1]-1)
+
+        dx = abs(x_min - x_max) / (data.shape[0] - 1)
+        dy = abs(y_min - y_max) / (data.shape[1] - 1)
 
         fig = go.Figure()
         fig.add_trace(
@@ -191,9 +192,10 @@ def plot_mesh_tally(
                 dy=dy,
                 showscale=colorbar,
                 colorbar=colorbar_kwargs,
-                colorscale='viridis',
-                line = {'width': 0}
-            ))
+                colorscale="viridis",
+                line={"width": 0},
+            )
+        )
         fig.update_layout(
             xaxis_title=xlabel,
             yaxis_title=ylabel,
@@ -207,43 +209,46 @@ def plot_mesh_tally(
         )
 
         if outline and geometry is not None:
-            
-            image_value = get_outline(mesh, basis, slice_index, geometry, outline_by, pixels)
-            
-            dx = abs(x_min - x_max)/(image_value.shape[0]-1)
-            dy = abs(y_min - y_max)/(image_value.shape[1]-1)
+            image_value = get_outline(
+                mesh, basis, slice_index, geometry, outline_by, pixels
+            )
+
+            dx = abs(x_min - x_max) / (image_value.shape[0] - 1)
+            dy = abs(y_min - y_max) / (image_value.shape[1] - 1)
             fig.add_trace(
-              go.Contour(
-                z=image_value,
-                x0=x_min,
-                dx=dx,
-                y0=y_min,
-                dy=dy,
-                contours_coloring='lines',
-                colorscale=[[0, 'black'], [1.0, 'black']],
-                line = {'width': 1, 'color': 'rgb(50,50,50)'}
-        #         contours=dict(
-        #     start=0,
-        #     end=8,
-        #     size=2,
-        # ),
-                # ncontours=1
-                # line = {'width': 0}
-              )  
+                go.Contour(
+                    z=image_value,
+                    x0=x_min,
+                    dx=dx,
+                    y0=y_min,
+                    dy=dy,
+                    contours_coloring="lines",
+                    colorscale=[[0, "black"], [1.0, "black"]],
+                    line={"width": 1, "color": "rgb(50,50,50)"}
+                    #         contours=dict(
+                    #     start=0,
+                    #     end=8,
+                    #     size=2,
+                    # ),
+                    # ncontours=1
+                    # line = {'width': 0}
+                )
             )
         print()
         return fig
 
-    elif plotting_backend == 'matplotlib':
-
-        im = axes.imshow(data, extent=(x_min, x_max, y_min, y_max), **default_imshow_kwargs)
+    elif plotting_backend == "matplotlib":
+        im = axes.imshow(
+            data, extent=(x_min, x_max, y_min, y_max), **default_imshow_kwargs
+        )
 
         if colorbar:
             fig.colorbar(im, **colorbar_kwargs)
 
         if outline and geometry is not None:
-
-            image_value = get_outline(mesh, basis, slice_index, geometry, outline_by, pixels)
+            image_value = get_outline(
+                mesh, basis, slice_index, geometry, outline_by, pixels
+            )
 
             # Plot image and return the axes
             axes.contour(
@@ -256,7 +261,10 @@ def plot_mesh_tally(
 
         return axes
     else:
-        raise ValueError(f'plotting_backend must be either matplotlib or plotly, not {plotting_backend}')
+        raise ValueError(
+            f"plotting_backend must be either matplotlib or plotly, not {plotting_backend}"
+        )
+
 
 def get_outline(mesh, basis, slice_index, geometry, outline_by, pixels):
     import matplotlib.image as mpimg
@@ -326,6 +334,7 @@ def get_outline(mesh, basis, slice_index, geometry, outline_by, pixels):
     else:  # basis == 'xy'
         image_value = np.rot90(image_value, 2)
     return image_value
+
 
 # TODO currently we allow slice index, but this code will be useful if want to
 # allow slicing by axis values / coordinates.

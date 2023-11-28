@@ -54,7 +54,7 @@ my_tallies.append(mesh_tally_1)
 model = openmc.model.Model(my_geometry, my_materials, my_settings, my_tallies)
 # sp_filename = model.run()
 
-sp_filename = '/home/jshimwell/reactor_csg_neutronics_model/statepoint.12.h5'
+sp_filename = "/home/jshimwell/reactor_csg_neutronics_model/statepoint.12.h5"
 
 # post process simulation result
 statepoint = openmc.StatePoint(sp_filename)
@@ -77,19 +77,19 @@ scaling_factor = neutrons_per_second * eV_to_joules * joules_to_mega_joules
 # in a regular mesh all the voxels have the same volume so the [0][0][0] just picks the first volume
 
 plot = plot_mesh_tally(
-    plotting_backend='plotly',
+    plotting_backend="plotly",
     tally=my_mesh_tally,
     outline=True,  # enables an outline around the geometry
     geometry=my_geometry,  # needed for outline
     norm=LogNorm(),  # log scale
     colorbar=True,
     scaling_factor=scaling_factor,
-    colorbar_kwargs={'title':'Heating [MJ cm-3s-1]'},
-    basis='xz',
+    colorbar_kwargs={"title": "Heating [MJ cm-3s-1]"},
+    basis="xz",
 )
 
 # setting title of the plot
-plot.update_layout({'title': ' made with openmc_regular_mesh_plotter'})
+plot.update_layout({"title": " made with openmc_regular_mesh_plotter"})
 plot.show()
 # plot.write_html("example_openmc_regular_mesh_plotter.html")
-print('file created example_openmc_regular_mesh_plotter.html')
+print("file created example_openmc_regular_mesh_plotter.html")
