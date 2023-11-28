@@ -52,13 +52,19 @@ mesh_tally_1.scores = ["heating"]
 my_tallies.append(mesh_tally_1)
 
 model = openmc.model.Model(my_geometry, my_materials, my_settings, my_tallies)
-sp_filename = model.run()
+# sp_filename = model.run()
+
+sp_filename = '/home/jshimwell/reactor_csg_neutronics_model/statepoint.12.h5'
 
 # post process simulation result
 statepoint = openmc.StatePoint(sp_filename)
 
+print(statepoint.tallies)
+
 # extracts the mesh tally by name
-my_mesh_tally = statepoint.get_tally(name="mesh_tally")
+# my_mesh_tally = statepoint.get_tally(name="mesh_tally")
+# my_mesh_tally = statepoint.get_tally(name="neutron_H3-production_on_regular_xy_mesh")
+my_mesh_tally = statepoint.get_tally(name="neutron_H3-production_on_regular_xz_mesh")
 
 # default tally units for heating are in eV per source neutron
 # for this example plot we want Mega Joules per second per cm3 or Mjcm^-3s^-1
@@ -71,13 +77,19 @@ scaling_factor = neutrons_per_second * eV_to_joules * joules_to_mega_joules
 # in a regular mesh all the voxels have the same volume so the [0][0][0] just picks the first volume
 
 plot = plot_mesh_tally(
+    plotting_backend='plotly',
     tally=my_mesh_tally,
     outline=True,  # enables an outline around the geometry
     geometry=my_geometry,  # needed for outline
     norm=LogNorm(),  # log scale
-    colorbar=False,
+    colorbar=True,
+    scaling_factor=scaling_factor,
+    colorbar_kwargs={'title':'Heating [MJ cm-3s-1]'},
+    basis='xz',
 )
 
-plot.title.set_text("")
-plot.figure.savefig("example_openmc_regular_mesh_plotter.png")
-print('file created example_openmc_regular_mesh_plotter.png')
+# setting title of the plot
+plot.update_layout({'title': ' made with openmc_regular_mesh_plotter'})
+plot.show()
+# plot.write_html("example_openmc_regular_mesh_plotter.html")
+print('file created example_openmc_regular_mesh_plotter.html')

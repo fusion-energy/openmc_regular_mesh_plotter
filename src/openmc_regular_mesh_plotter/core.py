@@ -45,6 +45,7 @@ def plot_mesh_tally(
     scaling_factor: typing.Optional[float] = None,
     colorbar_kwargs: dict = {},
     outline_kwargs: dict = _default_outline_kwargs,
+    plotting_backend: str = 'matplotlib',
     **kwargs,
 ) -> "matplotlib.image.AxesImage":
     """Display a slice plot of the mesh tally score.
@@ -175,90 +176,156 @@ def plot_mesh_tally(
             slice_index,
         )
 
-    im = axes.imshow(data, extent=(x_min, x_max, y_min, y_max), **default_imshow_kwargs)
+    if plotting_backend == 'plotly':
+        import plotly.graph_objects as go
+        dx = abs(x_min - x_max)/(data.shape[0]-1)
+        dy = abs(y_min - y_max)/(data.shape[1]-1)
 
-    if colorbar:
-        fig.colorbar(im, **colorbar_kwargs)
-
-    if outline and geometry is not None:
-        import matplotlib.image as mpimg
-
-        # code to make sure geometry outline is in the middle of the mesh voxel
-        # two of the three dimensions are just in the center of the mesh
-        # but the slice can move one axis off the center so this needs calculating
-        x0, y0, z0 = mesh.lower_left
-        x1, y1, z1 = mesh.upper_right
-        nx, ny, nz = mesh.dimension
-        center_of_mesh = mesh.bounding_box.center
-
-        if basis == "xy":
-            zarr = np.linspace(z0, z1, nz + 1)
-            center_of_mesh_slice = [
-                center_of_mesh[0],
-                center_of_mesh[1],
-                (zarr[slice_index] + zarr[slice_index + 1]) / 2,
-            ]
-        if basis == "xz":
-            yarr = np.linspace(y0, y1, ny + 1)
-            center_of_mesh_slice = [
-                center_of_mesh[0],
-                (yarr[slice_index] + yarr[slice_index + 1]) / 2,
-                center_of_mesh[2],
-            ]
-        if basis == "yz":
-            xarr = np.linspace(x0, x1, nx + 1)
-            center_of_mesh_slice = [
-                (xarr[slice_index] + xarr[slice_index + 1]) / 2,
-                center_of_mesh[1],
-                center_of_mesh[2],
-            ]
-
-        model = openmc.Model()
-        model.geometry = geometry
-        plot = openmc.Plot()
-        plot.origin = center_of_mesh_slice
-        bb_width = mesh.bounding_box.extent[basis]
-        plot.width = (bb_width[0] - bb_width[1], bb_width[2] - bb_width[3])
-        aspect_ratio = (bb_width[0] - bb_width[1]) / (bb_width[2] - bb_width[3])
-        pixels_y = math.sqrt(pixels / aspect_ratio)
-        pixels = (int(pixels / pixels_y), int(pixels_y))
-        plot.pixels = pixels
-        plot.basis = basis
-        plot.color_by = outline_by
-        model.plots.append(plot)
-
-        with TemporaryDirectory() as tmpdir:
-            # Run OpenMC in geometry plotting mode
-            model.plot_geometry(False, cwd=tmpdir)
-
-            # Read image from file
-            img_path = Path(tmpdir) / f"plot_{plot.id}.png"
-            if not img_path.is_file():
-                img_path = img_path.with_suffix(".ppm")
-            img = mpimg.imread(str(img_path))
-
-        # Combine R, G, B values into a single int
-        rgb = (img * 256).astype(int)
-        image_value = (rgb[..., 0] << 16) + (rgb[..., 1] << 8) + (rgb[..., 2])
-
-        if basis == "xz":
-            image_value = np.rot90(image_value, 2)
-        elif basis == "yz":
-            image_value = np.rot90(image_value, 2)
-        else:  # basis == 'xy'
-            image_value = np.rot90(image_value, 2)
-
-        # Plot image and return the axes
-        axes.contour(
-            image_value,
-            origin="upper",
-            levels=np.unique(image_value),
-            extent=(x_min, x_max, y_min, y_max),
-            **outline_kwargs,
+        fig = go.Figure()
+        fig.add_trace(
+            go.Contour(
+                z=data,
+                x0=x_min,
+                dx=dx,
+                y0=y_min,
+                dy=dy,
+                showscale=colorbar,
+                colorbar=colorbar_kwargs,
+                colorscale='viridis',
+                line = {'width': 0}
+            ))
+        fig.update_layout(
+            xaxis_title=xlabel,
+            yaxis_title=ylabel,
+            # can be used to ensure aspect ratio but prevents resizing
+            # height=abs(y_min - y_max),
+            # width=abs(x_min - x_max)
+        )
+        fig.update_yaxes(
+            scaleanchor="x",
+            scaleratio=1,
         )
 
-    return axes
+        if outline and geometry is not None:
+            
+            image_value = get_outline(mesh, basis, slice_index, geometry, outline_by, pixels)
+            
+            dx = abs(x_min - x_max)/(image_value.shape[0]-1)
+            dy = abs(y_min - y_max)/(image_value.shape[1]-1)
+            fig.add_trace(
+              go.Contour(
+                z=image_value,
+                x0=x_min,
+                dx=dx,
+                y0=y_min,
+                dy=dy,
+                contours_coloring='lines',
+                colorscale=[[0, 'black'], [1.0, 'black']],
+                line = {'width': 1, 'color': 'rgb(50,50,50)'}
+        #         contours=dict(
+        #     start=0,
+        #     end=8,
+        #     size=2,
+        # ),
+                # ncontours=1
+                # line = {'width': 0}
+              )  
+            )
+        print()
+        return fig
 
+    elif plotting_backend == 'matplotlib':
+
+        im = axes.imshow(data, extent=(x_min, x_max, y_min, y_max), **default_imshow_kwargs)
+
+        if colorbar:
+            fig.colorbar(im, **colorbar_kwargs)
+
+        if outline and geometry is not None:
+
+            image_value = get_outline(mesh, basis, slice_index, geometry, outline_by, pixels)
+
+            # Plot image and return the axes
+            axes.contour(
+                image_value,
+                origin="upper",
+                levels=np.unique(image_value),
+                extent=(x_min, x_max, y_min, y_max),
+                **outline_kwargs,
+            )
+
+        return axes
+    else:
+        raise ValueError(f'plotting_backend must be either matplotlib or plotly, not {plotting_backend}')
+
+def get_outline(mesh, basis, slice_index, geometry, outline_by, pixels):
+    import matplotlib.image as mpimg
+
+    # code to make sure geometry outline is in the middle of the mesh voxel
+    # two of the three dimensions are just in the center of the mesh
+    # but the slice can move one axis off the center so this needs calculating
+    x0, y0, z0 = mesh.lower_left
+    x1, y1, z1 = mesh.upper_right
+    nx, ny, nz = mesh.dimension
+    center_of_mesh = mesh.bounding_box.center
+
+    if basis == "xy":
+        zarr = np.linspace(z0, z1, nz + 1)
+        center_of_mesh_slice = [
+            center_of_mesh[0],
+            center_of_mesh[1],
+            (zarr[slice_index] + zarr[slice_index + 1]) / 2,
+        ]
+    if basis == "xz":
+        yarr = np.linspace(y0, y1, ny + 1)
+        center_of_mesh_slice = [
+            center_of_mesh[0],
+            (yarr[slice_index] + yarr[slice_index + 1]) / 2,
+            center_of_mesh[2],
+        ]
+    if basis == "yz":
+        xarr = np.linspace(x0, x1, nx + 1)
+        center_of_mesh_slice = [
+            (xarr[slice_index] + xarr[slice_index + 1]) / 2,
+            center_of_mesh[1],
+            center_of_mesh[2],
+        ]
+
+    model = openmc.Model()
+    model.geometry = geometry
+    plot = openmc.Plot()
+    plot.origin = center_of_mesh_slice
+    bb_width = mesh.bounding_box.extent[basis]
+    plot.width = (bb_width[0] - bb_width[1], bb_width[2] - bb_width[3])
+    aspect_ratio = (bb_width[0] - bb_width[1]) / (bb_width[2] - bb_width[3])
+    pixels_y = math.sqrt(pixels / aspect_ratio)
+    pixels = (int(pixels / pixels_y), int(pixels_y))
+    plot.pixels = pixels
+    plot.basis = basis
+    plot.color_by = outline_by
+    model.plots.append(plot)
+
+    with TemporaryDirectory() as tmpdir:
+        # Run OpenMC in geometry plotting mode
+        model.plot_geometry(False, cwd=tmpdir)
+
+        # Read image from file
+        img_path = Path(tmpdir) / f"plot_{plot.id}.png"
+        if not img_path.is_file():
+            img_path = img_path.with_suffix(".ppm")
+        img = mpimg.imread(str(img_path))
+
+    # Combine R, G, B values into a single int
+    rgb = (img * 256).astype(int)
+    image_value = (rgb[..., 0] << 16) + (rgb[..., 1] << 8) + (rgb[..., 2])
+
+    if basis == "xz":
+        image_value = np.rot90(image_value, 2)
+    elif basis == "yz":
+        image_value = np.rot90(image_value, 2)
+    else:  # basis == 'xy'
+        image_value = np.rot90(image_value, 2)
+    return image_value
 
 # TODO currently we allow slice index, but this code will be useful if want to
 # allow slicing by axis values / coordinates.
