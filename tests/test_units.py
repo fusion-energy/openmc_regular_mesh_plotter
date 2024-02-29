@@ -215,7 +215,7 @@ def test_plot_with_energy_filters(model):
     with openmc.StatePoint(sp_filename) as statepoint:
         tally_result_1 = statepoint.get_tally(name="mesh_tally")
 
-    with pytest.raises(ValueError) as excinfo:  
+    with pytest.raises(ValueError) as excinfo:
         plot_mesh_tally(tally=tally_result_1)
     msg = (
         "An EnergyFilter was found on the tally with more "
@@ -226,7 +226,7 @@ def test_plot_with_energy_filters(model):
         "bin are unsupported"
     )
     assert str(excinfo.value) == msg
-  
+
     energy_filter = openmc.EnergyFilter([0, 2e6])
     mesh_tally_1.filters = [mesh_filter, energy_filter]
 
