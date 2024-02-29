@@ -104,6 +104,7 @@ def plot_mesh_tally(
     if isinstance(tally, typing.Sequence):
         mesh_ids = []
         for one_tally in tally:
+            _check_tally_for_energy_filters_with_multiple_bins(one_tally)
             mesh = one_tally.find_filter(filter_type=openmc.MeshFilter).mesh
             # TODO check the tallies use the same mesh
             mesh_ids.append(mesh.id)
@@ -113,6 +114,7 @@ def plot_mesh_tally(
             )
     else:
         mesh = tally.find_filter(filter_type=openmc.MeshFilter).mesh
+        _check_tally_for_energy_filters_with_multiple_bins(tally)
 
     if isinstance(mesh, openmc.CylindricalMesh):
         raise NotImplemented(
@@ -299,9 +301,26 @@ def get_index_where(self, value: float, basis: str = "xy"):
     return slice_index
 
 
+def _check_tally_for_energy_filters_with_multiple_bins(tally):
+    for current_filter in tally.filters:
+        if isinstance(current_filter, openmc.EnergyFilter):
+            if isinstance(current_filter, openmc.EnergyFilter):
+                if current_filter.num_bins > 1:
+                    msg = (
+                        "An EnergyFilter was found on the tally with more "
+                        "than a single bin. EnergyFilter.num_bins="
+                        f"{current_filter.num_bins}. Either reduce the number "
+                        "of energy bins to 1 or remove the EnergyFilter to "
+                        "plot this tally. EnergyFilter with more than 1 energy "
+                        "bin are unsupported"
+                    )
+                    raise ValueError(msg)
+
+
 def _get_tally_data(
     scaling_factor, mesh, basis, tally, value, volume_normalization, score, slice_index
 ):
+
     # if score is not specified and tally has a single score then we know which score to use
     if score is None:
         if len(tally.scores) == 1:

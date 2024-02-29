@@ -29,11 +29,7 @@ my_settings.inactive = 0
 my_settings.particles = 5000
 my_settings.run_mode = "fixed source"
 # Create a DT point source
-try:
-    source = openmc.IndependentSource()
-except:
-    # work with older versions of openmc
-    source = openmc.Source()
+source = openmc.IndependentSource()
 source.space = openmc.stats.Point((100, 0, 0))
 source.angle = openmc.stats.Isotropic()
 source.energy = openmc.stats.Discrete([14e6], [1])
@@ -46,8 +42,9 @@ mesh = openmc.RegularMesh().from_domain(
     dimension=[40, 40, 40],
 )
 mesh_filter = openmc.MeshFilter(mesh)
+energy_filter = openmc.EnergyFilter([0, 1e6, 2e6])
 mesh_tally_1 = openmc.Tally(name="mesh_tally")
-mesh_tally_1.filters = [mesh_filter]
+mesh_tally_1.filters = [mesh_filter, energy_filter]
 mesh_tally_1.scores = ["heating"]
 my_tallies.append(mesh_tally_1)
 

@@ -197,4 +197,48 @@ def test_plot_two_mesh_tallies(model):
     assert plot.get_ylim() == (-3.0, 3.5)
 
 
+def test_plot_with_energy_filters(model):
+    geometry = model.geometry
+
+    mesh = openmc.RegularMesh().from_domain(geometry, dimension=[2, 20, 30])
+    mesh_filter = openmc.MeshFilter(mesh)
+    energy_filter = openmc.EnergyFilter([0, 1e6, 2e6])
+    mesh_tally_1 = openmc.Tally(name="mesh_tally")
+    mesh_tally_1.filters = [mesh_filter, energy_filter]
+    mesh_tally_1.scores = ["heating"]
+
+    tallies = openmc.Tallies([mesh_tally_1])
+
+    model.tallies = tallies
+
+    sp_filename = model.run()
+    with openmc.StatePoint(sp_filename) as statepoint:
+        tally_result_1 = statepoint.get_tally(name="mesh_tally")
+
+    with pytest.raises(ValueError) as excinfo:
+        plot_mesh_tally(tally=tally_result_1)
+    msg = (
+        "An EnergyFilter was found on the tally with more "
+        "than a single bin. EnergyFilter.num_bins="
+        "2. Either reduce the number "
+        "of energy bins to 1 or remove the EnergyFilter to "
+        "plot this tally. EnergyFilter with more than 1 energy "
+        "bin are unsupported"
+    )
+    assert str(excinfo.value) == msg
+
+    energy_filter = openmc.EnergyFilter([0, 2e6])
+    mesh_tally_1.filters = [mesh_filter, energy_filter]
+
+    tallies = openmc.Tallies([mesh_tally_1])
+
+    model.tallies = tallies
+
+    sp_filename = model.run()
+    with openmc.StatePoint(sp_filename) as statepoint:
+        tally_result_1 = statepoint.get_tally(name="mesh_tally")
+
+    plot_mesh_tally(tally=tally_result_1)
+
+
 # todo catch errors when 2d mesh used and 1d axis selected for plotting'
