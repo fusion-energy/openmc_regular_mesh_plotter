@@ -42,9 +42,8 @@ mesh = openmc.RegularMesh().from_domain(
     dimension=[40, 40, 40],
 )
 mesh_filter = openmc.MeshFilter(mesh)
-energy_filter = openmc.EnergyFilter([0, 1e6, 2e6])
 mesh_tally_1 = openmc.Tally(name="mesh_tally")
-mesh_tally_1.filters = [mesh_filter, energy_filter]
+mesh_tally_1.filters = [mesh_filter]
 mesh_tally_1.scores = ["heating"]
 my_tallies.append(mesh_tally_1)
 
