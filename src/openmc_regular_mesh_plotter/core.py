@@ -324,7 +324,14 @@ def _check_tally_for_energy_filters_with_multiple_bins(tally):
 
 
 def _get_tally_data(
-    scaling_factor, mesh, basis, tally, value, volume_normalization, score, slice_index
+    scaling_factor:float,
+    mesh:openmc.RegularMesh,
+    basis:str,
+    tally:openmc.Tally,
+    value:str,
+    volume_normalization:bool,
+    score:str,
+    slice_index:int
 ):
 
     # if score is not specified and tally has a single score then we know which score to use
